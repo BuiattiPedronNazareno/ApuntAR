@@ -1,17 +1,19 @@
 package com.apuntar.apuntarservidor.aplicacion.puertos;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.apuntar.apuntarservidor.dominio.modelos.Usuario;
 
 public interface UsuarioRepositoryPort {
-    Optional<Usuario> findAll();
-    Usuario findById(Long id);
+    List<Usuario> findAll();
+    Optional<Usuario> findById(Long id);
     Usuario save(Usuario usuario);
     void deleteById(Integer id);
 
-    Usuario findByNombreUsuario(String nombreUsuario);
-    Usuario findByEmail(String email);
+    Optional<Usuario> findByNombreUsuario(String nombreUsuario);
+    Optional<Usuario> findByEmail(String email);
+    
 }
 
 

@@ -1,13 +1,16 @@
 package com.apuntar.apuntarservidor.aplicacion.puertos;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.apuntar.apuntarservidor.dominio.modelos.Nivel;
 
 public interface NivelRepositoryPort {
-    Optional<Nivel> findAll();
-    Nivel findById(Long id);
-    Nivel findByDescripcion(Integer descripcion);
+    List<Nivel> findAll();
+    Optional<Nivel> findById(Long id);
+
+    Optional<Nivel> findByDescripcion(Integer descripcion);
+
 }
 
 /*Propuestas a ver:

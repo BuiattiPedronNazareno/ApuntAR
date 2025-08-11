@@ -1,26 +1,21 @@
-package com.apuntar.apuntarservidor.aplicacion.puertos;
+package com.apuntar.apuntarservidor.infraestructura.persistencia;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Optional;
 
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+import com.apuntar.apuntarservidor.aplicacion.puertos.NotaRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Nota;
 
-public interface NotaRepositoryPort {
-    List<Nota> findAll();
-    Optional<Nota> findById(Long id);
-    Nota save(Nota nota);
-    void deleteById(Long id);
+@Repository
+public interface NotaJpaRepository extends JpaRepository<Nota, Long>, NotaRepositoryPort {
     
     Optional<Nota> findByPrioridad(String prioridad);
     Optional<Nota> findByUsuarioId(Long usuarioId);
     Optional<Nota> findByMateriaId(Long materiaId);
     Optional<Nota> findByFechaCreacion(LocalDate fechaCreacion);
     Optional<Nota> findByTitulo(String titulo);
-
-    /*Propuestas a ver:
-        - updates
-        - otros deletes
-    */
 
 }

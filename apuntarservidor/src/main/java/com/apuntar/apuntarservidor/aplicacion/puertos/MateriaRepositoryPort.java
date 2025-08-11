@@ -1,18 +1,19 @@
 package com.apuntar.apuntarservidor.aplicacion.puertos;
 
+import java.util.List;
 import java.util.Optional;
 
 import com.apuntar.apuntarservidor.dominio.modelos.Materia;
 
 public interface MateriaRepositoryPort {
-    Optional<Materia> findAll();
-    Materia findById(Long id);
+    List<Materia> findAll();
+    Optional<Materia> findById(Long id);
     Materia save(Materia materia);
     void deleteById(Integer id);
 
-    Materia findByNombre(String nombre);
-    Materia findByNivel(String nivel);
-    Materia findByNivelAcademico(String nivelAcademico);
+    Optional<Materia> findByNombre(String nombre);
+    Optional<Materia> findByNivel(String nivel);
+    Optional<Materia> findByNivelAcademico(String nivelAcademico);
 
     /*Propuestas a ver:
         - updates
