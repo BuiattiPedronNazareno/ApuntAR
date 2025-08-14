@@ -2,6 +2,8 @@ package com.apuntar.apuntarservidor.dominio.modelos;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -33,9 +35,11 @@ public class Usuario {
     @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
     private String email;
 
+    @JsonIgnore    
     @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
     private String contrasenia;
 
     @OneToMany(mappedBy = "usuario", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Nota> notas;
+    
 }

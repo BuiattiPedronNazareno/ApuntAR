@@ -15,6 +15,9 @@ public class UsuarioService {
     @Autowired
     private UsuarioRepositoryPort usuarioRepository;
 
+    @Autowired
+    private PasswordService passwordService;
+
     public List<Usuario> obtenerTodosLosUsuarios(){
         return usuarioRepository.findAll();
     }
@@ -24,6 +27,7 @@ public class UsuarioService {
     }
 
     public Usuario persistirUsuario(Usuario usuario){
+        usuario.setContrasenia(passwordService.hashPassword(usuario.getContrasenia()));
         return usuarioRepository.save(usuario);
     }
 
