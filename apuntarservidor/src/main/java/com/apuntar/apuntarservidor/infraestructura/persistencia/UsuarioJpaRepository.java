@@ -11,7 +11,10 @@ import com.apuntar.apuntarservidor.dominio.modelos.Usuario;
 @Repository
 public interface UsuarioJpaRepository extends JpaRepository<Usuario, Long>, UsuarioRepositoryPort {
  
+    @Override
     Optional<Usuario> findByNombreUsuario(String nombreUsuario);
+
+    @Override
     Optional<Usuario> findByEmail(String email);
 
 }

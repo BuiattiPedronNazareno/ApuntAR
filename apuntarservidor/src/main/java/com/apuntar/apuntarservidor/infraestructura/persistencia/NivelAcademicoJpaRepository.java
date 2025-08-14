@@ -11,6 +11,7 @@ import com.apuntar.apuntarservidor.dominio.modelos.NivelAcademico;
 @Repository
 public interface NivelAcademicoJpaRepository extends JpaRepository<NivelAcademico, Long>, NivelAcademicoRepositoryPort {
 
+    @Override
     Optional<NivelAcademico> findByDescripcion(String descripcion);
     
 }

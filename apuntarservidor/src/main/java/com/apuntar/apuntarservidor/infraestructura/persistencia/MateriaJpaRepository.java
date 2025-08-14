@@ -11,8 +11,13 @@ import com.apuntar.apuntarservidor.dominio.modelos.Materia;
 @Repository
 public interface MateriaJpaRepository extends JpaRepository<Materia, Long>, MateriaRepositoryPort {
     
+    @Override
     Optional<Materia> findByNombre(String nombre);
+
+    @Override
     Optional<Materia> findByNivel(String nivel);
+
+    @Override
     Optional<Materia> findByNivelAcademico(String nivelAcademico);
 
 }

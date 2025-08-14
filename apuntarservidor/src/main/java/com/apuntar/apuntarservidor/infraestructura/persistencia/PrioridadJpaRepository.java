@@ -11,6 +11,7 @@ import com.apuntar.apuntarservidor.dominio.modelos.Prioridad;
 @Repository
 public interface PrioridadJpaRepository extends JpaRepository<Prioridad, Long>, PrioridadRepositoryPort {
     
+    @Override
     Optional<Prioridad> findByDescripcion(String descripcion);
 
 }

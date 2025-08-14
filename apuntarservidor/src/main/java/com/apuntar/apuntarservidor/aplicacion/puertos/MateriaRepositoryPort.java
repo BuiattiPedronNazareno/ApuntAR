@@ -9,7 +9,7 @@ public interface MateriaRepositoryPort {
     List<Materia> findAll();
     Optional<Materia> findById(Long id);
     Materia save(Materia materia);
-    void deleteById(Integer id);
+    void deleteById(Long id);
 
     Optional<Materia> findByNombre(String nombre);
     Optional<Materia> findByNivel(String nivel);

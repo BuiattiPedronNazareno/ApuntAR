@@ -9,7 +9,7 @@ public interface UsuarioRepositoryPort {
     List<Usuario> findAll();
     Optional<Usuario> findById(Long id);
     Usuario save(Usuario usuario);
-    void deleteById(Integer id);
+    void deleteById(Long id);
 
     Optional<Usuario> findByNombreUsuario(String nombreUsuario);
     Optional<Usuario> findByEmail(String email);
