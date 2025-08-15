@@ -20,4 +20,7 @@ public interface MateriaJpaRepository extends JpaRepository<Materia, Long>, Mate
     @Override
     Optional<Materia> findByNivelAcademico(String nivelAcademico);
 
+    @Override
+    boolean existsByNombre(String nombre);
+
 }

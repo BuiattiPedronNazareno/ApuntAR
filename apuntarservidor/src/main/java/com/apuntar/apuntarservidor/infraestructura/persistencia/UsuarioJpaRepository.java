@@ -17,4 +17,10 @@ public interface UsuarioJpaRepository extends JpaRepository<Usuario, Long>, Usua
     @Override
     Optional<Usuario> findByEmail(String email);
 
+    @Override
+    boolean existsByEmail(String email);
+
+    @Override
+    boolean existsByNombreUsuario(String nombreUsuario);
+
 }

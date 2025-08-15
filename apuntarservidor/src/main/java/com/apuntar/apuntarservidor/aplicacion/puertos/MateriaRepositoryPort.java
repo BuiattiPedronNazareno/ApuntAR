@@ -14,6 +14,7 @@ public interface MateriaRepositoryPort {
     Optional<Materia> findByNombre(String nombre);
     Optional<Materia> findByNivel(String nivel);
     Optional<Materia> findByNivelAcademico(String nivelAcademico);
+    boolean existsByNombre(String nombre);
 
     /*Propuestas a ver:
         - updates

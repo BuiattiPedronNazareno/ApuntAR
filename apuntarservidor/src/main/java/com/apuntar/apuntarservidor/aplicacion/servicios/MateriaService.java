@@ -8,12 +8,15 @@ import org.springframework.stereotype.Service;
 
 import com.apuntar.apuntarservidor.aplicacion.puertos.MateriaRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Materia;
+import com.apuntar.apuntarservidor.dominio.servicios.MateriaDomainService;
 
 @Service
 public class MateriaService {
     
     @Autowired
     private MateriaRepositoryPort materiaRepository;
+
+    private final MateriaDomainService materiaDomainService = new MateriaDomainService();
 
     public List<Materia> obtenerTodasLasMaterias(){
         return materiaRepository.findAll();
@@ -24,6 +27,10 @@ public class MateriaService {
     }
 
     public Materia persistirMateria(Materia materia){
+        materiaDomainService.validarCamposObligatorios(materia);
+        if (materiaRepository.existsByNombre(materia.getNombre())) {
+            throw new RuntimeException("El nombre de la materia ya está registrado");
+        }
         return materiaRepository.save(materia);
     }
 

@@ -9,12 +9,15 @@ import org.springframework.stereotype.Service;
 
 import com.apuntar.apuntarservidor.aplicacion.puertos.NotaRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Nota;
+import com.apuntar.apuntarservidor.dominio.servicios.NotaDomainService;
 
 @Service
 public class NotaService {
 
     @Autowired
     private NotaRepositoryPort notaRepository;
+
+    private final NotaDomainService notaDomainService = new NotaDomainService();
 
     public List<Nota> obtenerTodasLasNotas(){
         return notaRepository.findAll();
@@ -25,6 +28,10 @@ public class NotaService {
     }
 
     public Nota persistirNota(Nota nota){
+        notaDomainService.validarCamposObligatorios(nota);
+        if (notaRepository.existsByTitulo(nota.getTitulo())){
+            throw new RuntimeException("El título ya está registrado");
+        }
         return notaRepository.save(nota);
     }
 
