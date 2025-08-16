@@ -12,7 +12,3 @@ public interface NivelRepositoryPort {
     Optional<Nivel> findByDescripcion(Integer descripcion);
 
 }
-
-/*Propuestas a ver:
-    - consulta de las materias con ese nivel, si es necesario
-*/

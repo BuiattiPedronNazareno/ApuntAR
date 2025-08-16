@@ -18,10 +18,3 @@ public interface UsuarioRepositoryPort {
     
 }
 
-
-/*Propuestas a ver:
-    - updates
-    - otros deletes
-    - consulta de las notas asociadas a ese usuario
-    - consulta combinada de las materias asociadas al usuario
-*/

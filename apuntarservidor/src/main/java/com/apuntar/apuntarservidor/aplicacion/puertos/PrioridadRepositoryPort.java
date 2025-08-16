@@ -13,6 +13,3 @@ public interface PrioridadRepositoryPort {
     
 }
 
-/*Propuestas a ver:
-    - consulta de las notas con esa prioridad, si es necesario
-*/

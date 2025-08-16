@@ -38,15 +38,15 @@ public class MateriaService {
         materiaRepository.deleteById(id);
     }
 
-    public Optional<Materia> encontrarPorNombre(String nombre){
+    public Optional<Materia> obtenerPorNombre(String nombre){
         return materiaRepository.findByNombre(nombre);
     }
 
-    public Optional<Materia> encontrarPorNivel(String nivel){
+    public Optional<Materia> obtenerPorNivel(String nivel){
         return materiaRepository.findByNivel(nivel);
     }
 
-    public Optional<Materia> encontrarPorNivelAcademico(String nivelAcademico){
+    public Optional<Materia> obtenerPorNivelAcademico(String nivelAcademico){
         return materiaRepository.findByNivelAcademico(nivelAcademico);
     }
 

@@ -19,9 +19,4 @@ public interface NotaRepositoryPort {
     Optional<Nota> findByTitulo(String titulo);
     boolean existsByTitulo(String titulo);
 
-    /*Propuestas a ver:
-        - updates
-        - otros deletes
-    */
-
 }

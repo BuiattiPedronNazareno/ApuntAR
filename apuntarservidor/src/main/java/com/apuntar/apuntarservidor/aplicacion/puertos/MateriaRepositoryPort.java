@@ -16,9 +16,4 @@ public interface MateriaRepositoryPort {
     Optional<Materia> findByNivelAcademico(String nivelAcademico);
     boolean existsByNombre(String nombre);
 
-    /*Propuestas a ver:
-        - updates
-        - otros deletes
-        - consulta de las notas asociadas a esa materia
-    */
 }

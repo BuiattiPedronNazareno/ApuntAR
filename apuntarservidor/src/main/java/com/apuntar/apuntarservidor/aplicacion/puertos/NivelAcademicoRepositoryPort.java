@@ -13,6 +13,3 @@ public interface NivelAcademicoRepositoryPort {
     
 }
 
-/*Propuestas a ver:
-    - consulta de las materias con ese nivelAcademico, si es necesario
-*/
