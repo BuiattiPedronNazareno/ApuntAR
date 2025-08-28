@@ -22,7 +22,7 @@ public class MateriaService {
         return materiaRepository.findAll();
     }
 
-    public Optional<Materia> obtenerPorId(Long id){
+    public Optional<Materia> obtenerPorId(Integer id){
         return materiaRepository.findById(id);
     }
 
@@ -34,7 +34,7 @@ public class MateriaService {
         return materiaRepository.save(materia);
     }
 
-    public void eliminarMateria(Long id){
+    public void eliminarMateria(Integer id){
         materiaRepository.deleteById(id);
     }
 
@@ -42,11 +42,11 @@ public class MateriaService {
         return materiaRepository.findByNombre(nombre);
     }
 
-    public Optional<Materia> obtenerPorNivel(String nivel){
+    public List<Materia> obtenerPorNivel(Integer nivel){
         return materiaRepository.findByNivel(nivel);
     }
 
-    public Optional<Materia> obtenerPorNivelAcademico(String nivelAcademico){
+    public List<Materia> obtenerPorNivelAcademico(String nivelAcademico){
         return materiaRepository.findByNivelAcademico(nivelAcademico);
     }
 

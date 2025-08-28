@@ -19,7 +19,7 @@ public class NivelAcademicoService {
         return nivelAcademicoRepository.findAll();
     }
 
-    public Optional<NivelAcademico> obtenerPorId(Long id){
+    public Optional<NivelAcademico> obtenerPorId(Integer id){
         return nivelAcademicoRepository.findById(id);
     }
 

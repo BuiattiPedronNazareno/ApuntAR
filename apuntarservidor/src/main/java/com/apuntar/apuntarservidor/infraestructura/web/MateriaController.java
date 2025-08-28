@@ -13,26 +13,41 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apuntar.apuntarservidor.aplicacion.dtos.MateriaDTO;
 import com.apuntar.apuntarservidor.aplicacion.servicios.MateriaService;
 import com.apuntar.apuntarservidor.dominio.modelos.Materia;
 
 @RestController
-@RequestMapping("/api/materias")
+@RequestMapping("/materias")
 public class MateriaController {
     
     @Autowired
     private MateriaService materiaService;
 
     @GetMapping
-    public ResponseEntity<List<Materia>> getAllMaterias(){
-        return ResponseEntity.ok(materiaService.obtenerTodasLasMaterias());
+    public ResponseEntity<List<MateriaDTO>> getAllMaterias() {
+        List<Materia> materias = materiaService.obtenerTodasLasMaterias();
+        List<MateriaDTO> materiasDTO = materias.stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(materiasDTO);
+    }
+
+    private MateriaDTO convertToDTO(Materia materia) {
+        return new MateriaDTO(
+                materia.getId(),
+                materia.getNombre(),
+                materia.getNivel(),
+                materia.getNivelAcademico()
+        );
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Materia> getMateriaPorId(@PathVariable Long id){
+    public ResponseEntity<MateriaDTO> getMateriaPorId(@PathVariable Integer id){
         return materiaService.obtenerPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(this::convertToDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -41,13 +56,13 @@ public class MateriaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Materia> updateMateria(@PathVariable Long id, @RequestBody Materia materiaActualizada){
+    public ResponseEntity<Materia> updateMateria(@PathVariable Integer id, @RequestBody Materia materiaActualizada){
         materiaActualizada.setId(id);
         return ResponseEntity.ok(materiaService.persistirMateria(materiaActualizada));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMateria(@PathVariable Long id){
+    public ResponseEntity<Void> deleteMateria(@PathVariable Integer id){
         materiaService.eliminarMateria(id);
         return ResponseEntity.noContent().build();
     }
@@ -60,17 +75,21 @@ public class MateriaController {
     }
 
     @GetMapping("/nivel/{nivel}")
-    public ResponseEntity<Materia> buscarPorNivel(@PathVariable String nivel){
-        return materiaService.obtenerPorNivel(nivel)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<MateriaDTO>> buscarPorNivel(@PathVariable Integer nivel){
+        List<MateriaDTO> dtos = materiaService.obtenerPorNivel(nivel)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/nivelAcademico/{nivelAcademico}")
-    public ResponseEntity<Materia> buscarPorNivelAcademico(@PathVariable String nivelAcademico){
-        return materiaService.obtenerPorNivelAcademico(nivelAcademico)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<MateriaDTO>> buscarPorNivelAcademico(@PathVariable String nivelAcademico){
+        List<MateriaDTO> dtos = materiaService.obtenerPorNivelAcademico(nivelAcademico)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
 }

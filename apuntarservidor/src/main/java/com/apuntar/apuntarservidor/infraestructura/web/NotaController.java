@@ -3,6 +3,7 @@ package com.apuntar.apuntarservidor.infraestructura.web;
 import java.time.LocalDate;
 import java.util.List;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -14,27 +15,52 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apuntar.apuntarservidor.aplicacion.dtos.NotaDTO;
 import com.apuntar.apuntarservidor.aplicacion.servicios.NotaService;
 import com.apuntar.apuntarservidor.dominio.modelos.Nota;
 
+
 @RestController
-@RequestMapping("/api/notas")
+@RequestMapping("/notas")
 public class NotaController {
     
     @Autowired
     private NotaService notaService;
 
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(NotaController.class);
+
     @GetMapping
-    public ResponseEntity<List<Nota>> getAllNotas(){
-        return ResponseEntity.ok(notaService.obtenerTodasLasNotas());
+    public ResponseEntity<List<NotaDTO>> getAllNotas(){
+
+        List<Nota> notas = notaService.obtenerTodasLasNotas();
+        logger.info("Cantidad de notas obtenidas: {}", notas.size());
+
+        List<NotaDTO> notasDTO = notaService.obtenerTodasLasNotas()
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(notasDTO);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Nota> getNotaById(@PathVariable Long id){
+    public ResponseEntity<NotaDTO> getNotaById(@PathVariable Integer id){
         return notaService.obtenerPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(this::convertToDTO)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
+
+    private NotaDTO convertToDTO(Nota nota) {
+        return new NotaDTO(
+            nota.getId(),
+            nota.getTitulo(),
+            nota.getContenido(),
+            nota.getPrioridad(),
+            nota.getFechaCreacion(),
+            nota.getMateria() != null ? nota.getMateria().getId() : null
+        );
+    }
+
 
     @PostMapping
     public ResponseEntity<Nota> createNota(@RequestBody Nota nota){
@@ -42,50 +68,50 @@ public class NotaController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Nota> updateNota(@PathVariable Long id, @RequestBody Nota notaActualizada){
+    public ResponseEntity<Nota> updateNota(@PathVariable Integer id, @RequestBody Nota notaActualizada){
         notaActualizada.setId(id);
         return ResponseEntity.ok(notaService.persistirNota(notaActualizada));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteNota(@PathVariable Long id){
+    public ResponseEntity<Void> deleteNota(@PathVariable Integer id){
         notaService.eliminarNota(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/prioridad/{prioridad}")
-    public ResponseEntity<Nota> buscarPorPrioridad(@PathVariable String prioridad){
-        return notaService.buscarPorPrioridad(prioridad)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<NotaDTO>> buscarPorPrioridad(@PathVariable String prioridad) {
+        List<NotaDTO> dtos = notaService.buscarPorPrioridad(prioridad)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/titulo/{titulo}")
-    public ResponseEntity<Nota> buscarPorTitulo(@PathVariable String titulo){
-        return notaService.buscarPorTitulo(titulo)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
-    }
-
-    @GetMapping("/usuario/{usuarioId}")
-    public ResponseEntity<Nota> buscarPorUsuarioId(@PathVariable Long usuarioId){
-        return notaService.buscarPorUsuarioId(usuarioId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<NotaDTO>> buscarPorTitulo(@PathVariable String titulo) {
+        List<NotaDTO> dtos = notaService.buscarPorTitulo(titulo)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/materia/{materiaId}")
-    public ResponseEntity<Nota> buscarPorMateriaId(@PathVariable Long materiaId){
-        return notaService.buscarPorMateriaId(materiaId)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<NotaDTO>> buscarPorMateriaId(@PathVariable Integer materiaId) {
+        List<NotaDTO> dtos = notaService.buscarPorMateriaId(materiaId)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/fechaCreacion/{fechaCreacion}")
-    public ResponseEntity<Nota> buscarPorFechaCreacion(@PathVariable LocalDate fechaCreacion){
-        return notaService.buscarPorFechaCreacion(fechaCreacion)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<List<NotaDTO>> buscarPorFechaCreacion(@PathVariable LocalDate fechaCreacion) {
+        List<NotaDTO> dtos = notaService.buscarPorFechaCreacion(fechaCreacion)
+                .stream()
+                .map(this::convertToDTO)
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
-
 }

@@ -9,30 +9,37 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apuntar.apuntarservidor.aplicacion.dtos.NivelDTO;
 import com.apuntar.apuntarservidor.aplicacion.servicios.NivelService;
 import com.apuntar.apuntarservidor.dominio.modelos.Nivel;
 
 @RestController
-@RequestMapping("/api/niveles")
+@RequestMapping("/niveles")
 public class NivelController {
     
     @Autowired
     private NivelService nivelService;
 
     @GetMapping
-    public ResponseEntity<List<Nivel>> getAllNiveles(){
-        return ResponseEntity.ok(nivelService.obtenerTodosLosNiveles());
+    public ResponseEntity<List<NivelDTO>> getAllNiveles(){
+        List<NivelDTO> dtos = nivelService.obtenerTodosLosNiveles()
+                .stream()
+                .map(n -> new NivelDTO(n.getId(), n.getDescripcion()))
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<Nivel> getUsuarioById(@PathVariable Long id){
+    public ResponseEntity<NivelDTO> getPorId(@PathVariable Integer id){
         return nivelService.obtenerPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(n -> new NivelDTO(n.getId(), n.getDescripcion()))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+
     @GetMapping("/descripcion/{descripcion}")
-    public ResponseEntity<Nivel> getUsuarioByDescripcion(@PathVariable Integer descripcion){
+    public ResponseEntity<Nivel> buscarPorDescripcion(@PathVariable Integer descripcion){
         return nivelService.obtenerPorDescripcion(descripcion)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());

@@ -9,30 +9,37 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apuntar.apuntarservidor.aplicacion.dtos.NivelAcademicoDTO;
 import com.apuntar.apuntarservidor.aplicacion.servicios.NivelAcademicoService;
 import com.apuntar.apuntarservidor.dominio.modelos.NivelAcademico;
 
 @RestController
-@RequestMapping("/api/NivelAcademicos")
+@RequestMapping("/nivelesacademicos")
 public class NivelAcademicoController {
     
     @Autowired
     private NivelAcademicoService nivelAcademicoService;
 
     @GetMapping
-    public ResponseEntity<List<NivelAcademico>> getAllNivelesAcademicos(){
-        return ResponseEntity.ok(nivelAcademicoService.obtenerTodosLosNivelesAcademicos());
+    public ResponseEntity<List<NivelAcademicoDTO>> getAllNivelesAcademicos(){
+        List<NivelAcademicoDTO> dtos = nivelAcademicoService.obtenerTodosLosNivelesAcademicos()
+                .stream()
+                .map(n -> new NivelAcademicoDTO(n.getId(), n.getDescripcion()))
+                .toList();
+        return ResponseEntity.ok(dtos);
     }
 
     @GetMapping("/id/{id}")
-    public ResponseEntity<NivelAcademico> getUsuarioById(@PathVariable Long id){
+    public ResponseEntity<NivelAcademicoDTO> getPorId(@PathVariable Integer id){
         return nivelAcademicoService.obtenerPorId(id)
-            .map(ResponseEntity::ok)
-            .orElse(ResponseEntity.notFound().build());
+                .map(n -> new NivelAcademicoDTO(n.getId(), n.getDescripcion()))
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
+
     @GetMapping("/descripcion/{descripcion}")
-    public ResponseEntity<NivelAcademico> getUsuarioByDescripcion(@PathVariable String descripcion){
+    public ResponseEntity<NivelAcademico> buscarPorDescripcion(@PathVariable String descripcion){
         return nivelAcademicoService.obtenerPorDescripcion(descripcion)
             .map(ResponseEntity::ok)
             .orElse(ResponseEntity.notFound().build());

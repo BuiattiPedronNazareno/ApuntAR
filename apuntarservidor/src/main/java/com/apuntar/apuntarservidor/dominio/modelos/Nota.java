@@ -2,6 +2,8 @@ package com.apuntar.apuntarservidor.dominio.modelos;
 
 import java.time.LocalDate;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -15,12 +17,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "Nota")
+@Table(name = "Nota", schema = "apuntarBD")
 public class Nota {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID")
+    private Integer id;
 
     @Column(columnDefinition = "LONGTEXT")
     private String contenido;
@@ -34,12 +37,9 @@ public class Nota {
     @Column(nullable = false, columnDefinition = "MEDIUMTEXT")
     private String titulo;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "materiaID", nullable = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = true)
+    @JoinColumn(name = "materiaID", referencedColumnName = "ID")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private Materia materia;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuarioID", nullable = false)
-    private Usuario usuario;
     
 }

@@ -8,14 +8,11 @@ public class NotaDomainService {
         if(nota.getTitulo() == null || nota.getTitulo().isEmpty()){
             throw new RuntimeException("El título de la nota es obligatorio");
         }
-        if(nota.getFechaCreacion() == null || nota.getFechaCreacion().isEmpty()){
+        if(nota.getFechaCreacion() == null){
             throw new RuntimeException("La fecha creación de la nota es obligatorio");
         }
         if(nota.getMateria() == null){
             throw new RuntimeException("La materia de la nota es obligatorio");
-        }
-        if(nota.getUsuario() == null){
-            throw new RuntimeException("El usuario de la nota es obligatorio");
         }
     }
 

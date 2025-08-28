@@ -7,7 +7,7 @@ import com.apuntar.apuntarservidor.dominio.modelos.Nivel;
 
 public interface NivelRepositoryPort {
     List<Nivel> findAll();
-    Optional<Nivel> findById(Long id);
+    Optional<Nivel> findById(Integer id);
 
     Optional<Nivel> findByDescripcion(Integer descripcion);
 

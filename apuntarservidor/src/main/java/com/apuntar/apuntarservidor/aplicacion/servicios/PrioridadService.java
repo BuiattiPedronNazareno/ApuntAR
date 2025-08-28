@@ -19,7 +19,7 @@ public class PrioridadService {
         return prioridadRepository.findAll();
     }
 
-    public Optional<Prioridad> obtenerPorId(Long id){
+    public Optional<Prioridad> obtenerPorId(Integer id){
         return prioridadRepository.findById(id);
     }
 

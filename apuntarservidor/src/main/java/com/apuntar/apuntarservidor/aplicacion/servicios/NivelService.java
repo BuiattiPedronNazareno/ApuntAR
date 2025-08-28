@@ -19,7 +19,7 @@ public class NivelService {
         return nivelRepository.findAll();
     }
 
-    public Optional<Nivel> obtenerPorId(Long id){
+    public Optional<Nivel> obtenerPorId(Integer id){
         return nivelRepository.findById(id);
     }
 

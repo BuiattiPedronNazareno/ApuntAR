@@ -9,7 +9,7 @@ import com.apuntar.apuntarservidor.aplicacion.puertos.NivelAcademicoRepositoryPo
 import com.apuntar.apuntarservidor.dominio.modelos.NivelAcademico;
 
 @Repository
-public interface NivelAcademicoJpaRepository extends JpaRepository<NivelAcademico, Long>, NivelAcademicoRepositoryPort {
+public interface NivelAcademicoJpaRepository extends JpaRepository<NivelAcademico, Integer>, NivelAcademicoRepositoryPort {
 
     @Override
     Optional<NivelAcademico> findByDescripcion(String descripcion);

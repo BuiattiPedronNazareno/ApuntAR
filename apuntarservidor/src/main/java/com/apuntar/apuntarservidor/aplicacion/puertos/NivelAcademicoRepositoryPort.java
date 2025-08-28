@@ -7,7 +7,7 @@ import com.apuntar.apuntarservidor.dominio.modelos.NivelAcademico;
 
 public interface NivelAcademicoRepositoryPort {
     List<NivelAcademico> findAll();
-    Optional<NivelAcademico> findById(Long id);
+    Optional<NivelAcademico> findById(Integer id);
 
     Optional<NivelAcademico> findByDescripcion(String descripcion);
     

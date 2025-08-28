@@ -10,12 +10,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "Nivel")
+@Table(name = "Nivel", schema = "apuntarBD")
 public class Nivel {
     
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID")
+    private Integer id;
 
     @Column(nullable = false)
     private Integer descripcion;

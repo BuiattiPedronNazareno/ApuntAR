@@ -6,6 +6,7 @@ import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.apuntar.apuntarservidor.aplicacion.puertos.NotaRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Nota;
@@ -19,11 +20,12 @@ public class NotaService {
 
     private final NotaDomainService notaDomainService = new NotaDomainService();
 
+    @Transactional(readOnly = true)
     public List<Nota> obtenerTodasLasNotas(){
-        return notaRepository.findAll();
+        return notaRepository.findAll(); // sesión abierta durante la carga
     }
 
-    public Optional<Nota> obtenerPorId(Long id){
+    public Optional<Nota> obtenerPorId(Integer id){
         return notaRepository.findById(id);
     }
 
@@ -35,27 +37,23 @@ public class NotaService {
         return notaRepository.save(nota);
     }
 
-    public void eliminarNota(Long id){
+    public void eliminarNota(Integer id){
         notaRepository.deleteById(id);
     }
 
-    public Optional<Nota> buscarPorPrioridad(String prioridad){
+    public List<Nota> buscarPorPrioridad(String prioridad){
         return notaRepository.findByPrioridad(prioridad);
     }
 
-    public Optional<Nota> buscarPorUsuarioId(Long id){
-        return notaRepository.findByUsuarioId(id);
+    public List<Nota> buscarPorMateriaId(Integer id){
+        return notaRepository.findByMateria_Id(id);
     }
 
-    public Optional<Nota> buscarPorMateriaId(Long id){
-        return notaRepository.findByMateriaId(id);
-    }
-
-    public Optional<Nota> buscarPorFechaCreacion(LocalDate fechaCreacion){
+    public List<Nota> buscarPorFechaCreacion(LocalDate fechaCreacion){
         return notaRepository.findByFechaCreacion(fechaCreacion);
     }
 
-    public Optional<Nota> buscarPorTitulo(String titulo){
+    public List<Nota> buscarPorTitulo(String titulo){
         return notaRepository.findByTitulo(titulo);
     }
     

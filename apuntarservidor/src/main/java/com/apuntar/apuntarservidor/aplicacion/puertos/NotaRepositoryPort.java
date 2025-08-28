@@ -8,15 +8,14 @@ import com.apuntar.apuntarservidor.dominio.modelos.Nota;
 
 public interface NotaRepositoryPort {
     List<Nota> findAll();
-    Optional<Nota> findById(Long id);
+    Optional<Nota> findById(Integer id);
     Nota save(Nota nota);
-    void deleteById(Long id);
+    void deleteById(Integer id);
     
-    Optional<Nota> findByPrioridad(String prioridad);
-    Optional<Nota> findByUsuarioId(Long usuarioId);
-    Optional<Nota> findByMateriaId(Long materiaId);
-    Optional<Nota> findByFechaCreacion(LocalDate fechaCreacion);
-    Optional<Nota> findByTitulo(String titulo);
+    List<Nota> findByPrioridad(String prioridad);
+    List<Nota> findByMateria_Id(Integer materiaID);
+    List<Nota> findByFechaCreacion(LocalDate fechaCreacion);
+    List<Nota> findByTitulo(String titulo);
     boolean existsByTitulo(String titulo);
 
 }

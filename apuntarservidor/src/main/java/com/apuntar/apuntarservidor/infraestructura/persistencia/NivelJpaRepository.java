@@ -9,7 +9,7 @@ import com.apuntar.apuntarservidor.aplicacion.puertos.NivelRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Nivel;
 
 @Repository
-public interface NivelJpaRepository extends JpaRepository<Nivel, Long>, NivelRepositoryPort{
+public interface NivelJpaRepository extends JpaRepository<Nivel, Integer>, NivelRepositoryPort{
 
     @Override
     Optional<Nivel> findByDescripcion(Integer descripcion);

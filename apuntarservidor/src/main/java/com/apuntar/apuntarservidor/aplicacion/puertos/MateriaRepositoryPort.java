@@ -6,14 +6,15 @@ import java.util.Optional;
 import com.apuntar.apuntarservidor.dominio.modelos.Materia;
 
 public interface MateriaRepositoryPort {
+    
     List<Materia> findAll();
-    Optional<Materia> findById(Long id);
+    Optional<Materia> findById(Integer id);
     Materia save(Materia materia);
-    void deleteById(Long id);
+    void deleteById(Integer id);
 
     Optional<Materia> findByNombre(String nombre);
-    Optional<Materia> findByNivel(String nivel);
-    Optional<Materia> findByNivelAcademico(String nivelAcademico);
+    List<Materia> findByNivel(Integer nivel);
+    List<Materia> findByNivelAcademico(String nivelAcademico);
     boolean existsByNombre(String nombre);
 
 }

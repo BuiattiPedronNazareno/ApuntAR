@@ -7,7 +7,7 @@ import com.apuntar.apuntarservidor.dominio.modelos.Prioridad;
 
 public interface PrioridadRepositoryPort {
     List<Prioridad> findAll();
-    Optional<Prioridad> findById(Long id);
+    Optional<Prioridad> findById(Integer id);
 
     Optional<Prioridad> findByDescripcion(String descripcion);
     

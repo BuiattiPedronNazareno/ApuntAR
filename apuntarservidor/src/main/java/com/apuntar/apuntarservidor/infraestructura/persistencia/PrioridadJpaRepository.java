@@ -9,7 +9,7 @@ import com.apuntar.apuntarservidor.aplicacion.puertos.PrioridadRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Prioridad;
 
 @Repository
-public interface PrioridadJpaRepository extends JpaRepository<Prioridad, Long>, PrioridadRepositoryPort {
+public interface PrioridadJpaRepository extends JpaRepository<Prioridad, Integer>, PrioridadRepositoryPort {
     
     @Override
     Optional<Prioridad> findByDescripcion(String descripcion);

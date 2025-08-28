@@ -10,12 +10,13 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "Prioridad")
+@Table(name = "Prioridad", schema = "apuntarBD")
 public class Prioridad {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @Column(name = "ID")
+    private Integer id;
 
     @Column(nullable = false, length = 45) 
     private String descripcion;

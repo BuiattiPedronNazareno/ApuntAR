@@ -1,5 +1,6 @@
 package com.apuntar.apuntarservidor.infraestructura.persistencia;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,16 +10,16 @@ import com.apuntar.apuntarservidor.aplicacion.puertos.MateriaRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Materia;
 
 @Repository
-public interface MateriaJpaRepository extends JpaRepository<Materia, Long>, MateriaRepositoryPort {
+public interface MateriaJpaRepository extends JpaRepository<Materia, Integer>, MateriaRepositoryPort {
     
     @Override
     Optional<Materia> findByNombre(String nombre);
 
     @Override
-    Optional<Materia> findByNivel(String nivel);
+    List<Materia> findByNivel(Integer nivel);
 
     @Override
-    Optional<Materia> findByNivelAcademico(String nivelAcademico);
+    List<Materia> findByNivelAcademico(String nivelAcademico);
 
     @Override
     boolean existsByNombre(String nombre);
