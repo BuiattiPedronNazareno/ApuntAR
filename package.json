@@ -5,7 +5,7 @@
     "dev": "concurrently \"cd apuntarservidor && mvn spring-boot:run\" \"cd apuntarcliente && npm run dev\""
   },
   "devDependencies": {
-    "concurrently": "^8.2.0"
+    "concurrently": "^8.2.2"
   },
   "dependencies": {
     "@mui/icons-material": "^7.3.1"

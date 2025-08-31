@@ -32,6 +32,7 @@ export default function CrearNota() {
     const [error, setError] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
+    const [showCreateMateria, setShowCreateMateria] = useState(false);
 
     useEffect(() => {
 
@@ -78,6 +79,10 @@ export default function CrearNota() {
         return () => clearTimeout(timer);
     }, [titulo]);
 
+    const handleCreateMateria = async () => {
+        router.push('/materias/crear');
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
@@ -114,8 +119,7 @@ export default function CrearNota() {
                 titulo,
                 contenido,
                 prioridad,
-                materiaID: Number(materiaID),
-                usuarioID: USER_ID
+                materiaID: Number(materiaID)
             });
             
             setSnackbarMessage('Nota creada exitosamente');
@@ -151,9 +155,22 @@ export default function CrearNota() {
     return (
         <Container maxWidth="md">
             <Box sx={{ mt: 4, mb: 4 }}>
-                <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                Crear Nueva Nota
-                </Typography>
+                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'text.primary' }}>
+                        Crear Nueva Nota
+                    </Typography>
+                    <Button
+                        variant="outlined"
+                        color="primary"
+                        onClick={handleCreateMateria}
+                        sx={{ 
+                            fontWeight: 'bold',
+                            textTransform: 'none'
+                        }}
+                    >
+                        + Nueva Materia
+                    </Button>
+                </Box>
                 
                 <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
                     <TextField
@@ -187,39 +204,54 @@ export default function CrearNota() {
                         sx={{ mb: 3, borderRadius: 1 }}
                     />
                     
-                    <FormControl fullWidth required error={!!error && !materiaID} sx={{ mb: 3 }}>
-                        <InputLabel>Materia</InputLabel>
-                        <Select
-                        value={materiaID}
-                        label="Materia"
-                        onChange={(e) => setMateriaID(e.target.value as number)}
-                        disabled={submitting || materias.length === 0}
+                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
+                        <FormControl fullWidth required error={!!error && !materiaID} sx={{ flex: 1, mr: 1 }}>
+                            <InputLabel>Materia</InputLabel>
+                            <Select
+                            value={materiaID}
+                            label="Materia"
+                            onChange={(e) => setMateriaID(e.target.value as number)}
+                            disabled={submitting || materias.length === 0}
+                            >
+                            {materias.length === 0 ? (
+                                <MenuItem value="" disabled>
+                                    No tienes materias registradas
+                                </MenuItem>
+                            ) : (
+                                materias.map((materia) => (
+                                <MenuItem key={materia.id} value={materia.id}>
+                                    {materia.nombre} ({materia.nivel} - {materia.nivelAcademico})
+                                </MenuItem>
+                                ))
+                            )}
+                            </Select>
+                            {error && !materiaID && (
+                            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
+                                {error}
+                            </Typography>
+                            )}
+                        </FormControl>
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={handleCreateMateria}
+                            disabled={submitting}
+                            sx={{ 
+                                height: '56px',
+                                minWidth: '120px',
+                                fontWeight: 'bold'
+                            }}
                         >
-                        {materias.length === 0 ? (
-                            <MenuItem value="" disabled>
-                            No tienes materias registradas
-                            </MenuItem>
-                        ) : (
-                            materias.map((materia) => (
-                            <MenuItem key={materia.id} value={materia.id}>
-                                {materia.nombre} ({materia.nivel} - {materia.nivelAcademico})
-                            </MenuItem>
-                            ))
-                        )}
-                        </Select>
-                        {error && !materiaID && (
-                        <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-                            {error}
-                        </Typography>
-                        )}
-                    </FormControl>
+                            + Nueva
+                        </Button>
+                    </Box>
                     
                     <FormControl fullWidth sx={{ mb: 3 }}>
                         <InputLabel>Prioridad</InputLabel>
                         <Select
                         value={prioridad}
                         label="Prioridad"
-                        onChange={(e) => setPrioridad(e.target.value)}
+                        onChange={(e) => setPrioridad(e.target.value as 'ALTA' | 'MEDIA' | 'BAJA')}
                         disabled={submitting}
                         >
                             <MenuItem value="ALTA">

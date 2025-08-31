@@ -1,7 +1,18 @@
 import { api } from './api';
 
+export interface Materia {
+    id: number;
+    nombre: string;
+    nivel: string;
+    nivelAcademico: string;
+}
 
 export const getMateriasPorUsuario = async (usuarioID: number) => {
-  const response = await api.get(`/materias/usuario/${usuarioID}`);
-  return response.data;
+    const response = await api.get(`/materias/usuario/${usuarioID}`);
+    return response.data;
+};
+
+export const createMateria = async (materia: Omit<Materia, 'id'>): Promise<Materia> => {
+    const response = await api.post<Materia>('/materias', materia);
+    return response.data;
 };
