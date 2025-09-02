@@ -7,10 +7,11 @@ export interface Materia {
     nivelAcademico: string;
 }
 
-export const getMateriasPorUsuario = async (usuarioID: number) => {
-    const response = await api.get(`/materias/usuario/${usuarioID}`);
+export const getMaterias = async (): Promise<Materia[]> => {
+    const response = await api.get('/materias');
     return response.data;
 };
+
 
 export const createMateria = async (materia: Omit<Materia, 'id'>): Promise<Materia> => {
     const response = await api.post<Materia>('/materias', materia);

@@ -1,54 +1,74 @@
-import { Button, Card, CardActions, CardContent, Chip, Typography } from "@mui/material";
+import { Card, CardContent, Chip, Typography, Box, alpha} from "@mui/material";
 import Link from "next/link";
-
+import { useTheme } from "@mui/material/styles";
 
 interface NoteCardProps {
     id: number;
     titulo: string;
-    contenido: string;
     prioridad: string;
+    materiaNombre: string;
 }
 
-export default function NoteCard({id, titulo, contenido, prioridad}: NoteCardProps){
+export default function NoteCard({ titulo, id, prioridad, materiaNombre }: NoteCardProps) {
+    
+    const theme = useTheme();
+
     return (
-        <Card sx={{
-            minWidth: 275,
-            margin: 2,
-            transition: 'transform 0.2s',
-            '&:hover': {
-                transform: 'scale(1.02)',
-            }
-        }}>
-            <CardContent>
-                <Typography variant="h5" component="div">
-                    {titulo}
-                </Typography>
-                <Typography variant="body2" color="text.secondary" sx={{
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    display: '-webkit-box',
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: 'vertical',
-                    maxHeight: '4.5rem',
-                    margin: '10px 0'
-                }}>
-                    {contenido}
-                </Typography>
-                <Chip
-                    label={prioridad}
-                    color={prioridad === 'ALTA' ? 'error': prioridad === 'MEDIA' ? 'warning' : 'info'}
-                    sx={{
-                        fontWeight: 'bold',
-                        borderRadius: 16,
-                        padding: '2px 10px'
-                    }}
-                />
-            </CardContent>
-            <CardActions>
-                <Button size="small" color="primary" component={Link} href={`/notas/${id}`}>
-                    Ver detalles
-                </Button>
-            </CardActions>
-        </Card>
+        <Link href={`/notas/${id}`} passHref style={{ textDecoration: 'none' }}>
+            <Card 
+                sx={{
+                    width: 220,
+                    height: 220,
+                    transition: 'transform 0.2s',
+                    display: 'flex',
+                    flexDirection: 'column',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    cursor: 'pointer',
+                    borderRadius: 3, 
+                    backgroundColor: alpha(theme.palette.background.paper, 0.7),
+                    backdropFilter: 'blur(10px)',
+                    '&:hover': {
+                        transform: 'scale(1.02)',
+                        boxShadow: theme.shadows[8],
+                    }
+                }}
+            >
+                <CardContent sx={{ textAlign: 'center' }}>
+
+                    <Box sx={{ position: "absolute", top: 8, left: 8 }}>
+                        <Chip
+                            label={materiaNombre}
+                            size="small"
+                            sx={{
+                                fontWeight: "bold",
+                                backgroundColor: alpha(theme.palette.background.paper, 0),
+                            }}
+                        />
+                    </Box>
+
+                    <Box sx={{ textAlign: "center", mt: 4 }}>
+                        <Typography variant="h6" component="div" gutterBottom>
+                            {titulo}
+                        </Typography>
+                        <Chip
+                            label={prioridad}
+                            sx={{
+                                fontWeight: 'bold',
+                                borderRadius: 10,
+                                padding: '1px 7px',
+                                color: "white",
+                                backgroundColor:
+                                    prioridad === 'ALTA'
+                                    ? '#4b2c5e' 
+                                    : prioridad === 'MEDIA'
+                                    ? '#1f4d3a' 
+                                    : '#6a1f2a', 
+                            }}
+                        />
+                    </Box>
+                </CardContent>
+            </Card>
+        </Link>
     );
 }

@@ -10,11 +10,12 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class NotaDTO {
+    
     private Integer id;
     private String titulo;
     private String contenido;
     private String prioridad;
     private LocalDate fechaCreacion;
-    private Integer materiaId;
+    private MateriaDTO materia;
 
 }

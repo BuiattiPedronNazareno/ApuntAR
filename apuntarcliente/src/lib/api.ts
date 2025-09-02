@@ -34,16 +34,37 @@ api.interceptors.response.use(response => {
 });
 
 
-api.interceptors.response.use(
-  response => response,
-  error => {
-    console.error('API Error:', {
-      url: error.config?.url,
-      status: error.response?.status,
-      data: error.response?.data,
-      message: error.message,
-      stack: error.stack
-    });
+api.interceptors.response.use(response => response, error => {
+  console.error('API Error completo:', error);
+  if (error.response?.status !== 422) {
+    const errorDetails = {
+      url: error.config?.url || 'URL no disponible',
+      status: error.response?.status || 'Estado no disponible',
+      data: error.response?.data || 'Datos no disponibles',
+      message: error.message || 'Mensaje no disponible',
+      stack: error.stack || 'Stack no disponible'
+    };
+    
+    console.error('API Error detallado:', errorDetails);
+
+    if (error.response?.status === 500) {
+      console.error('Error 500 detectado - Verifica el backend');
+      return Promise.reject(new Error('Error interno del servidor. Por favor, intente nuevamente.'));
+    }
+
+    if (error.response?.status === 400) {
+      if (error.response.data && 
+          (error.response.data.mensaje?.includes("título ya existe") || 
+           error.response.data.codigo === "TITULO_DUPLICADO")) {
+        return Promise.reject(new Error("El título ya existe para esta materia"));
+      }
+
+      if (error.response.data && error.response.data.mensaje) {
+        return Promise.reject(new Error(error.response.data.mensaje));
+      }
+      
+      return Promise.reject(new Error('Solicitud incorrecta. Por favor, revise los datos ingresados.'));
+    }
 
     if (!error.response) {
       console.error('Network Error - Verifica que el backend esté funcionando y la URL sea correcta');
@@ -59,11 +80,12 @@ api.interceptors.response.use(
         message: 'No tienes permisos para acceder a este recurso.'
       });
     }
+    
 
     return Promise.reject(error);
   }
+}
 );
-
 export const verifyToken = async (token: string) => {
   try {
     const base64Url = token.split('.')[1];

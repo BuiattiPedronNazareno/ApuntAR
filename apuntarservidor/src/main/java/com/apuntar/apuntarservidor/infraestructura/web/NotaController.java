@@ -13,11 +13,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.apuntar.apuntarservidor.aplicacion.dtos.MateriaDTO;
 import com.apuntar.apuntarservidor.aplicacion.dtos.NotaDTO;
 import com.apuntar.apuntarservidor.aplicacion.servicios.NotaService;
 import com.apuntar.apuntarservidor.dominio.modelos.Nota;
+
 
 
 @RestController
@@ -57,7 +60,14 @@ public class NotaController {
             nota.getContenido(),
             nota.getPrioridad(),
             nota.getFechaCreacion(),
-            nota.getMateria() != null ? nota.getMateria().getId() : null
+            nota.getMateria() != null
+            ? new MateriaDTO(
+                nota.getMateria().getId(),
+                nota.getMateria().getNombre(),
+                nota.getMateria().getNivel(),
+                nota.getMateria().getNivelAcademico()
+              )
+            : null
         );
     }
 
@@ -114,4 +124,10 @@ public class NotaController {
                 .toList();
         return ResponseEntity.ok(dtos);
     }
+
+    @GetMapping("/check-titulo")
+    public boolean existePorTitulo(@RequestParam String titulo, @RequestParam(required = false) Integer materiaID) {
+        return notaService.existePorTitulo(titulo, materiaID);
+    }
+    
 }

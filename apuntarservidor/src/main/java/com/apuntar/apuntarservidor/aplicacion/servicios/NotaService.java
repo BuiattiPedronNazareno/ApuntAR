@@ -11,6 +11,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.apuntar.apuntarservidor.aplicacion.puertos.NotaRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Nota;
 import com.apuntar.apuntarservidor.dominio.servicios.NotaDomainService;
+import com.apuntar.apuntarservidor.infraestructura.exception.TituloDuplicadoException;
 
 @Service
 public class NotaService {
@@ -22,7 +23,7 @@ public class NotaService {
 
     @Transactional(readOnly = true)
     public List<Nota> obtenerTodasLasNotas(){
-        return notaRepository.findAll(); // sesión abierta durante la carga
+        return notaRepository.findAll(); 
     }
 
     public Optional<Nota> obtenerPorId(Integer id){
@@ -31,8 +32,8 @@ public class NotaService {
 
     public Nota persistirNota(Nota nota){
         notaDomainService.validarCamposObligatorios(nota);
-        if (notaRepository.existsByTitulo(nota.getTitulo())){
-            throw new RuntimeException("El título ya está registrado");
+        if (nota.getMateria() != null && notaRepository.existsByTituloAndMateria_Id(nota.getTitulo(), nota.getMateria().getId())) {
+            throw new TituloDuplicadoException("EL_TITULO_YA_EXISTE_PARA_ESTA_MATERIA");
         }
         return notaRepository.save(nota);
     }
@@ -55,6 +56,14 @@ public class NotaService {
 
     public List<Nota> buscarPorTitulo(String titulo){
         return notaRepository.findByTitulo(titulo);
+    }
+
+    public boolean existePorTitulo(String titulo, Integer materiaID){
+        if (materiaID != null) {
+            return notaRepository.existsByTituloAndMateria_Id(titulo, materiaID);
+        } else {
+            return notaRepository.existsByTitulo(titulo);
+        }
     }
     
 }

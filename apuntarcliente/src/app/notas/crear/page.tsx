@@ -2,17 +2,12 @@
 
 import { useRouter } from 'next/navigation';
 import { ChangeEvent, useEffect, useState } from "react";
-import { Container, Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Alert, CircularProgress, Snackbar } from '@mui/material';
-import { getMateriasPorUsuario, createNota, checkTituloUnico } from '@/lib/nota';
-
-interface Materia {
-    id: number;
-    nombre: string;
-    nivel: string;
-    nivelAcademico: string;
-}
-
-const USER_ID = 1;
+import { Container, Box, Typography, TextField, Button, FormControl, InputLabel, Select, MenuItem, Alert, CircularProgress, Snackbar, Card, CardContent, FormHelperText } from '@mui/material';
+import { createNota, checkTituloUnico } from '@/lib/nota';
+import { getMaterias } from '@/lib/materia';
+import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
+import CloseIcon from '@mui/icons-material/Close';
+import { Materia } from '@/lib/materia';
 
 export default function CrearNota() {
     const router = useRouter();
@@ -24,25 +19,27 @@ export default function CrearNota() {
     const [materias, setMaterias] = useState<Materia[]>([]);
 
     const [tituloError, setTituloError] = useState('');
+    const [contenidoError, setContenidoError] = useState('');
+    const [materiaError, setMateriaError] = useState('');
     const [tituloValidating, setTituloValidating] = useState(false);
-    const [tituloUnico, setTituloUnico] = useState(true);
     
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
-    const [error, setError] = useState('');
     const [snackbarOpen, setSnackbarOpen] = useState(false);
     const [snackbarMessage, setSnackbarMessage] = useState('');
-    const [showCreateMateria, setShowCreateMateria] = useState(false);
+    
+    const [tituloTouched, setTituloTouched] = useState(false);
+    const [contenidoTouched, setContenidoTouched] = useState(false);
+    const [materiaTouched, setMateriaTouched] = useState(false);
 
     useEffect(() => {
-
         const fetchMaterias = async () => {
             try {
-                const data = await getMateriasPorUsuario(USER_ID);
+                const data = await getMaterias();
                 setMaterias(data);
                 setLoading(false);
             } catch (err) {
-                setError('Error al cargar materias. Por favor, intente nuevamente.');
+                setMateriaError('Error al cargar materias. Por favor, intente nuevamente.');
                 setLoading(false);
             }
         };
@@ -50,69 +47,71 @@ export default function CrearNota() {
         fetchMaterias();
     }, [router]);
 
-    useEffect(() => {
-        if (titulo.length < 3) {
-            setTituloError('El título debe tener al menos 3 caracteres');
-            setTituloUnico(true);
-            return;
-        }
+    const handleCreateMateria = async () => {
+        router.push('/materias/crear');
+    };
 
-        const timer = setTimeout(async () => {
-        if (titulo.length >= 3) {
+    const validateForm = async () => {
+        let isValid = true;
+        
+        if (!titulo.trim()) {
+            setTituloError('El título es obligatorio');
+            isValid = false;
+        } else if (titulo.length < 3) {
+            setTituloError('El título debe tener al menos 3 caracteres');
+            isValid = false;
+        } else {
             setTituloValidating(true);
             try {
-                const isUnique = await checkTituloUnico(titulo, USER_ID );
-                setTituloUnico(isUnique);
-            if (!isUnique) {
-                setTituloError('El título ya existe para este usuario');
-            } else {
-                setTituloError('');
-            }
-            } catch (err) {
-                setTituloError('Error al verificar el título');
+                const isUnique = await checkTituloUnico(titulo, materiaID ? Number(materiaID) : undefined);
+                if (!isUnique) {
+                    setTituloError('El título ya existe para esta materia');
+                    isValid = false;
+                } else {
+                    setTituloError('');
+                }
+            } catch (err: unknown) {
+                if (err instanceof Error) {
+                    setTituloError(err.message);
+                } else {
+                    setTituloError('Error al verificar el título. Por favor, intente nuevamente.');
+                }
+                isValid = false;
             } finally {
                 setTituloValidating(false);
             }
         }
-        }, 500);
-
-        return () => clearTimeout(timer);
-    }, [titulo]);
-
-    const handleCreateMateria = async () => {
-        router.push('/materias/crear');
+        
+        if (!contenido.trim()) {
+            setContenidoError('El contenido es obligatorio');
+            isValid = false;
+        } else {
+            setContenidoError('');
+        }
+        
+        if (!materiaID) {
+            setMateriaError('Debe seleccionar una materia');
+            isValid = false;
+        } else {
+            setMateriaError('');
+        }
+        
+        return isValid;
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         
-        if (!titulo.trim()) {
-            setTituloError('El título es obligatorio');
-            return;
-        }
+        setTituloTouched(true);
+        setContenidoTouched(true);
+        setMateriaTouched(true);
         
-        if (titulo.length < 3) {
-            setTituloError('El título debe tener al menos 3 caracteres');
-            return;
-        }
-        
-        if (!tituloUnico) {
-            setTituloError('El título ya existe para este usuario');
-            return;
-        }
-        
-        if (!materiaID) {
-            setError('Debe seleccionar una materia');
-            return;
-        }
-        
-        if (!contenido.trim()) {
-            setError('El contenido es obligatorio');
+        const isValid = await validateForm();
+        if (!isValid) {
             return;
         }
         
         setSubmitting(true);
-        setError('');
         
         try {
             await createNota({
@@ -129,16 +128,21 @@ export default function CrearNota() {
                 router.push('/');
             }, 1000);
         } catch (err: unknown) {
-            if (err instanceof Error){
-                setError(err.message);
-            } else {
-                setError('Error al crear la nota. Por favor, intente nuevamente.');
+            if (err instanceof Error) {
+      
+                if (err.message.includes('título ya existe') || 
+                    err.message.includes('TITULO_DUPLICADO')) {
+                    setTituloError('El título ya existe para esta materia');
+                } else {
+                    setMateriaError(err.message);
+                }
+                } else {
+                setMateriaError('Error al crear la nota. Por favor, intente nuevamente.');
+                }
+            } finally {
+                setSubmitting(false);
             }
-            
-        } finally {
-            setSubmitting(false);
-        }
-    };
+        };
 
     const handleSnackbarClose = () => {
         setSnackbarOpen(false);
@@ -153,193 +157,282 @@ export default function CrearNota() {
     }
 
     return (
-        <Container maxWidth="md">
-            <Box sx={{ mt: 4, mb: 4 }}>
-                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
-                    <Typography variant="h4" gutterBottom sx={{ fontWeight: 'bold', color: 'text.primary' }}>
-                        Crear Nueva Nota
-                    </Typography>
-                    <Button
-                        variant="outlined"
-                        color="primary"
-                        onClick={handleCreateMateria}
-                        sx={{ 
-                            fontWeight: 'bold',
-                            textTransform: 'none'
-                        }}
-                    >
-                        + Nueva Materia
-                    </Button>
-                </Box>
-                
-                <Box component="form" onSubmit={handleSubmit} sx={{ mt: 3 }}>
-                    <TextField
-                        label="Título"
-                        value={titulo}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setTitulo(e.target.value)}
-                        fullWidth
-                        required
-                        error={!!tituloError}
-                        helperText={tituloError}
-                        disabled={submitting}
-                        InputProps={{
-                        endAdornment: tituloValidating && (
-                            <CircularProgress size={20} />
-                        )
-                        }}
-                        sx={{ mb: 3, borderRadius: 1 }}
-                    />
-                    
-                    <TextField
-                        label="Contenido"
-                        value={contenido}
-                        onChange={(e: ChangeEvent<HTMLInputElement>) => setContenido(e.target.value)}
-                        multiline
-                        rows={6}
-                        fullWidth
-                        required
-                        error={!!error && contenido.trim() === ''}
-                        helperText={error && contenido.trim() === '' ? 'El contenido es obligatorio' : ''}
-                        disabled={submitting}
-                        sx={{ mb: 3, borderRadius: 1 }}
-                    />
-                    
-                    <Box sx={{ display: 'flex', alignItems: 'center', mb: 3 }}>
-                        <FormControl fullWidth required error={!!error && !materiaID} sx={{ flex: 1, mr: 1 }}>
-                            <InputLabel>Materia</InputLabel>
-                            <Select
-                            value={materiaID}
-                            label="Materia"
-                            onChange={(e) => setMateriaID(e.target.value as number)}
-                            disabled={submitting || materias.length === 0}
-                            >
-                            {materias.length === 0 ? (
-                                <MenuItem value="" disabled>
-                                    No tienes materias registradas
-                                </MenuItem>
-                            ) : (
-                                materias.map((materia) => (
-                                <MenuItem key={materia.id} value={materia.id}>
-                                    {materia.nombre} ({materia.nivel} - {materia.nivelAcademico})
-                                </MenuItem>
-                                ))
-                            )}
-                            </Select>
-                            {error && !materiaID && (
-                            <Typography variant="body2" color="error" sx={{ mt: 1 }}>
-                                {error}
-                            </Typography>
-                            )}
-                        </FormControl>
+        <Container maxWidth="xl" sx={{ mt: 0, p: 0 }}>
+            <Box sx={{ 
+                display: 'flex', 
+                flexDirection: 'column',
+                height: 'calc(100vh - 64px)',
+            }}>
+                <Box sx={{ 
+                    display: 'flex', 
+                    justifyContent: 'flex-end',
+                    alignItems: 'center', 
+                    mb: 2,
+                    px: 2
+                }}> 
+                    <Box>
                         <Button
-                            variant="contained"
+                            variant="outlined"
                             color="primary"
-                            onClick={handleCreateMateria}
-                            disabled={submitting}
-                            sx={{ 
-                                height: '56px',
-                                minWidth: '120px',
-                                fontWeight: 'bold'
-                            }}
+                            onClick={() => router.back()}
+                            startIcon={<CloseIcon />}
+                            sx={{ mr: 0, mt:0 }}
                         >
-                            + Nueva
+                            Cancelar
                         </Button>
                     </Box>
-                    
-                    <FormControl fullWidth sx={{ mb: 3 }}>
-                        <InputLabel>Prioridad</InputLabel>
-                        <Select
-                        value={prioridad}
-                        label="Prioridad"
-                        onChange={(e) => setPrioridad(e.target.value as 'ALTA' | 'MEDIA' | 'BAJA')}
-                        disabled={submitting}
-                        >
-                            <MenuItem value="ALTA">
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Box 
-                                    sx={{ 
-                                    width: 12, 
-                                    height: 12, 
-                                    borderRadius: '50%', 
-                                    backgroundColor: 'error.main', 
-                                    mr: 1 
-                                    }} 
+                </Box>
+                
+                <Box sx={{ 
+                    display: 'flex', 
+                    flexGrow: 1,
+                    gap: 2,
+                    height: 'calc(100% - 60px)'
+                }}>
+                    <Box sx={{ 
+                        flex: '1 1 70%', 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        height: '100%'
+                    }}>
+                        <Card variant="outlined" sx={{ 
+                            borderRadius: 2, 
+                            boxShadow: 3,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            height: '100%'
+                        }}>
+                            <CardContent sx={{ 
+                                flex: 1,
+                                p: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                '&:last-child': { pb: 2 }
+                            }}>
+                                <TextField
+                                    value={titulo}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                        setTitulo(e.target.value);
+                                        if (tituloTouched) {
+                                            if (e.target.value.length < 3) {
+                                                setTituloError('El título debe tener al menos 3 caracteres');
+                                            } else {
+                                                setTituloError('');
+                                            }
+                                        }
+                                    }}
+                                    onBlur={() => setTituloTouched(true)}
+                                    placeholder="Título de la nota"
+                                    variant="standard"
+                                    fullWidth
+                                    error={!!tituloError && tituloTouched}
+                                    helperText={tituloTouched ? tituloError : ''}
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        sx: {
+                                            fontSize: '1.8rem',
+                                            fontWeight: 600,
+                                            '&:focus': {
+                                                backgroundColor: 'action.hover'
+                                            }
+                                        }
+                                    }}
+                                    InputLabelProps={{ shrink: false }}
                                 />
-                                Alta
-                                </Box>
-                            </MenuItem>
-                            <MenuItem value="MEDIA">
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Box 
-                                    sx={{ 
-                                    width: 12, 
-                                    height: 12, 
-                                    borderRadius: '50%', 
-                                    backgroundColor: 'warning.main', 
-                                    mr: 1 
-                                    }} 
+                                
+                                <TextField
+                                    value={contenido}
+                                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                                        setContenido(e.target.value);
+                                        if (contenidoTouched && !e.target.value.trim()) {
+                                            setContenidoError('El contenido es obligatorio');
+                                        } else if (contenidoTouched) {
+                                            setContenidoError('');
+                                        }
+                                    }}
+                                    onBlur={() => setContenidoTouched(true)}
+                                    multiline
+                                    fullWidth
+                                    placeholder="Escribe algo..."
+                                    variant="standard"
+                                    error={!!contenidoError && contenidoTouched}
+                                    helperText={contenidoTouched ? contenidoError : ''}
+                                    InputProps={{
+                                        disableUnderline: true,
+                                        sx: {
+                                            fontSize: '1rem',
+                                            minHeight: 'calc(100% - 40px)',
+                                            '& textarea': {
+                                                minHeight: 'calc(100% - 40px) !important',
+                                                resize: 'none'
+                                            }
+                                        }
+                                    }}
+                                    InputLabelProps={{ shrink: false }}
+                                    sx={{ mt: 2 }}
                                 />
-                                Media
+                            </CardContent>
+                        </Card>
+                    </Box>
+                    
+                    <Box sx={{ 
+                        flex: '1 1 30%', 
+                        display: 'flex', 
+                        flexDirection: 'column',
+                        height: '100%'
+                    }}>
+                        <Card variant="outlined" sx={{ 
+                            borderRadius: 2, 
+                            boxShadow: 3,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            height: '100%'
+                        }}>
+                            <CardContent sx={{ 
+                                flex: 1,
+                                p: 2,
+                                display: 'flex',
+                                flexDirection: 'column',
+                                '&:last-child': { pb: 2 }
+                            }}>
+                                <Box sx={{ 
+                                    display: 'flex', 
+                                    justifyContent: 'space-between', 
+                                    alignItems: 'center', 
+                                    mb: 2 
+                                }}>
+                                    <Typography variant="h6" fontWeight="bold" color="primary">
+                                        Detalles
+                                    </Typography>
                                 </Box>
-                            </MenuItem>
-                            <MenuItem value="BAJA">
-                                <Box sx={{ display: 'flex', alignItems: 'center' }}>
-                                <Box 
-                                    sx={{ 
-                                    width: 12, 
-                                    height: 12, 
-                                    borderRadius: '50%', 
-                                    backgroundColor: 'info.main', 
-                                    mr: 1 
-                                    }} 
-                                />
-                                Baja
+                                
+                                <FormControl 
+                                    fullWidth 
+                                    required 
+                                    sx={{ mb: 2 }} 
+                                    error={!!materiaError && materiaTouched}
+                                >
+                                    <InputLabel>Materia</InputLabel>
+                                    <Select
+                                        value={materiaID}
+                                        label="Materia"
+                                        onChange={(e) => {
+                                            setMateriaID(e.target.value as number);
+                                            if (materiaTouched) {
+                                                setMateriaError('');
+                                            }
+                                        }}
+                                        onBlur={() => setMateriaTouched(true)}
+                                        disabled={submitting || materias.length === 0}
+                                    >
+                                        {materias.length === 0 ? (
+                                            <MenuItem value="" disabled>
+                                                No tienes materias registradas
+                                            </MenuItem>
+                                        ) : (
+                                            materias.map((materia) => (
+                                                <MenuItem key={materia.id} value={materia.id}>
+                                                    {materia.nombre} ({materia.nivel} - {materia.nivelAcademico})
+                                                </MenuItem>
+                                            ))
+                                        )}
+                                    </Select>
+                                    {materiaTouched && materiaError && (
+                                        <FormHelperText error>{materiaError}</FormHelperText>
+                                    )}
+                                </FormControl>
+                                
+                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2 }}>
+                                    <Button
+                                        variant="text"
+                                        color="primary"
+                                        startIcon={<AddCircleOutlineIcon />}
+                                        onClick={handleCreateMateria}
+                                        disabled={submitting}
+                                    >
+                                        Nueva materia
+                                    </Button>
                                 </Box>
-                            </MenuItem>
-                        </Select>
-                    </FormControl>
-                    
-                    {error && (
-                        <Alert severity="error" sx={{ mb: 3 }}>
-                        {error}
-                        </Alert>
-                    )}
-                    
-                    <Button
-                        type="submit"
-                        variant="contained"
-                        color="primary"
-                        disabled={submitting || !tituloUnico || !materiaID || tituloValidating}
-                        sx={{ 
-                        py: 1.5, 
-                        px: 4, 
-                        fontSize: '1.1rem',
-                        fontWeight: 'bold',
-                        width: '100%',
-                        mb: 2
-                        }}
-                    >
-                        {submitting ? (
-                        <>
-                            <CircularProgress size={24} sx={{ mr: 1 }} />
-                            Creando...
-                        </>
-                        ) : 'Crear Nota'}
-                    </Button>
-                    
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={() => router.back()}
-                        disabled={submitting}
-                        sx={{ 
-                        py: 1.5, 
-                        px: 4, 
-                        width: '100%'
-                        }}
-                    >
-                        Cancelar
-                    </Button>
+                                
+                                <FormControl fullWidth sx={{ mb: 3 }}>
+                                    <InputLabel>Prioridad</InputLabel>
+                                    <Select
+                                        value={prioridad}
+                                        label="Prioridad"
+                                        onChange={(e) => setPrioridad(e.target.value as 'ALTA' | 'MEDIA' | 'BAJA')}
+                                        disabled={submitting}
+                                    >
+                                        <MenuItem value="ALTA">
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Box 
+                                                    sx={{ 
+                                                        width: 12, 
+                                                        height: 12, 
+                                                        borderRadius: '50%', 
+                                                        backgroundColor: '#4b2c5e', 
+                                                        mr: 1 
+                                                    }} 
+                                                />
+                                                Alta
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="MEDIA">
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Box 
+                                                    sx={{ 
+                                                        width: 12, 
+                                                        height: 12, 
+                                                        borderRadius: '50%', 
+                                                        backgroundColor: '#1f4d3a', 
+                                                        mr: 1 
+                                                    }} 
+                                                />
+                                                Media
+                                            </Box>
+                                        </MenuItem>
+                                        <MenuItem value="BAJA">
+                                            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                                <Box 
+                                                    sx={{ 
+                                                        width: 12, 
+                                                        height: 12, 
+                                                        borderRadius: '50%', 
+                                                        backgroundColor: '#6a1f2a', 
+                                                        mr: 1 
+                                                    }} 
+                                                />
+                                                Baja
+                                            </Box>
+                                        </MenuItem>
+                                    </Select>
+                                </FormControl>
+                                
+                                <Box sx={{ mt: 'auto' }}>
+                                    <Button
+                                        type="submit"
+                                        variant="contained"
+                                        color="primary"
+                                        disabled={submitting}
+                                        fullWidth
+                                        size="large"
+                                        onClick={handleSubmit}
+                                        sx={{ 
+                                            backgroundColor: '#234e68',
+                                            fontWeight: 'bold',
+                                            py: 1.5
+                                        }}
+                                    >
+                                        {submitting ? (
+                                            <>
+                                                <CircularProgress size={24} sx={{ mr: 1 }} />
+                                                Guardando...
+                                            </>
+                                        ) : 'Guardar Nota'}
+                                    </Button>
+                                </Box>
+                            </CardContent>
+                        </Card>
+                    </Box>
                 </Box>
             </Box>
         
@@ -350,11 +443,11 @@ export default function CrearNota() {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
             >
                 <Alert 
-                onClose={handleSnackbarClose} 
-                severity="success" 
-                sx={{ width: '100%' }}
+                    onClose={handleSnackbarClose} 
+                    severity="success" 
+                    sx={{ width: '100%' }}
                 >
-                {snackbarMessage}
+                    {snackbarMessage}
                 </Alert>
             </Snackbar>
         </Container>

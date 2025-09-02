@@ -75,6 +75,9 @@ export default function NotaDetail() {
                     variant="contained" 
                     color="primary" 
                     onClick={() => router.back()}
+                    sx={{ 
+                        backgroundColor: '#234e68',
+                    }}
                 >
                     Volver
                 </Button>

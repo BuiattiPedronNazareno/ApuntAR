@@ -163,6 +163,7 @@ export default function CrearMateria() {
                         color="primary"
                         disabled={submitting || !!nombreError || !!nivelError || !!nivelAcademicoError}
                         sx={{ 
+                            backgroundColor: '#234e68',
                             py: 1.5, 
                             px: 4, 
                             fontSize: '1.1rem',

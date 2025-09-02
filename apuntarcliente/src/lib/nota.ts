@@ -5,8 +5,13 @@ export interface Nota {
     titulo: string;
     contenido: string;
     prioridad: string;
-    fechaCreacion: Date;
-    materiaID: number;
+    fechaCreacion: string;
+    materia?: {
+        id: number;
+        nombre?: string;
+        nivel?: string;
+        nivelAcademico?: string;
+    };
 }
 
 export interface Materia {
@@ -16,13 +21,35 @@ export interface Materia {
     nivelAcademico: string;
 }
 
+interface AxiosErrorLike {
+    response?: {
+        status?: number;
+    };
+}
+
+function isAxiosErrorLike(error: unknown): error is AxiosErrorLike {
+    return typeof error === 'object' && error !== null && 'response' in error;
+}
+
 export const getNotas = async (): Promise<Nota[]> => {
     const response = await api.get<Nota[]>('/notas');
     return response.data;
 };
 
-export const createNota = async (nota: Omit<Nota, 'id' | 'fechaCreacion'>): Promise<Nota> => {
-    const response = await api.post<Nota>('/notas', nota);
+export const createNota = async (nota: 
+  {
+    titulo: string;
+    contenido: string;
+    prioridad: string;
+    materiaID: number;
+  }): Promise<Nota> => {
+    const response = await api.post<Nota>('/notas', {
+        titulo: nota.titulo,
+        contenido: nota.contenido,
+        prioridad: nota.prioridad,
+        fechaCreacion: new Date().toISOString().split("T")[0], 
+        materia: { id: nota.materiaID } 
+    });
     return response.data;
 };
 
@@ -31,19 +58,23 @@ export const getNotaById = async (id: number): Promise<Nota> => {
     return response.data;
 };
 
-export const getMateriasPorUsuario = async (usuarioId: number): Promise<Materia[]> => {
-    const response = await api.get(`/materias/usuario/${usuarioId}`);
-    return response.data;
-};
-
-export const checkTituloUnico = async (titulo: string, usuarioId: number): Promise<boolean> => {
-    try {
-        const response = await api.get(`/notas/check-titulo`, {
-        params: { titulo, usuarioId }
-        });
-        return response.data.isUnique;
-    } catch (error) {
-        console.error('Error checking title uniqueness:', error);
-        return false;
+export const checkTituloUnico = async (titulo: string, materiaID?: number): Promise<boolean> => {
+  try {
+    const params: { titulo: string; materiaID?: number } = { titulo };
+    if (materiaID !== undefined && materiaID !== null) {
+      params.materiaID = materiaID;
     }
+    
+    const response = await api.get(`/notas/check-titulo`, { params });
+    return response.data?.isUnique ?? true;
+  } catch (error: unknown) {
+    console.error('Error checking title uniqueness:', error);
+    if (isAxiosErrorLike(error) && error.response?.status === 422) {
+      return false;
+    }
+    if (isAxiosErrorLike(error) && error.response?.status === 404) {
+      return true;
+    }
+    throw new Error('Error al verificar el título. Por favor, intente nuevamente.');
+  }
 };

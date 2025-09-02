@@ -17,5 +17,5 @@ public interface NotaRepositoryPort {
     List<Nota> findByFechaCreacion(LocalDate fechaCreacion);
     List<Nota> findByTitulo(String titulo);
     boolean existsByTitulo(String titulo);
-
+    boolean existsByTituloAndMateria_Id(String titulo, Integer materiaId);
 }
