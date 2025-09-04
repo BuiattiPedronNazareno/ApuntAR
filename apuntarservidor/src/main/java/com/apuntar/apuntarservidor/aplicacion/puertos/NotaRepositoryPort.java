@@ -18,4 +18,8 @@ public interface NotaRepositoryPort {
     List<Nota> findByTitulo(String titulo);
     boolean existsByTitulo(String titulo);
     boolean existsByTituloAndMateria_Id(String titulo, Integer materiaId);
+    boolean existsByTituloAndMateria_IdAndIdNot(String titulo, Integer materiaId, Integer id);
+    boolean existsByTituloAndIdNot(String titulo, Integer id);
+    void deleteByMateria_Id(Integer materiaID);
+
 }

@@ -126,8 +126,8 @@ public class NotaController {
     }
 
     @GetMapping("/check-titulo")
-    public boolean existePorTitulo(@RequestParam String titulo, @RequestParam(required = false) Integer materiaID) {
-        return notaService.existePorTitulo(titulo, materiaID);
+    public boolean existePorTitulo(@RequestParam String titulo, @RequestParam(required = false) Integer materiaID, @RequestParam(required = false) Integer notaId ) {
+        return notaService.existePorTitulo(titulo, materiaID, notaId);
     }
     
 }

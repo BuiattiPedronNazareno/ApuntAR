@@ -27,6 +27,14 @@ interface AxiosErrorLike {
     };
 }
 
+type UpdateNotaPayload = {
+  titulo: string;
+  contenido: string;
+  prioridad: string;
+  fechaCreacion: string;
+  materia?: { id: number };
+};
+
 function isAxiosErrorLike(error: unknown): error is AxiosErrorLike {
     return typeof error === 'object' && error !== null && 'response' in error;
 }
@@ -58,15 +66,18 @@ export const getNotaById = async (id: number): Promise<Nota> => {
     return response.data;
 };
 
-export const checkTituloUnico = async (titulo: string, materiaID?: number): Promise<boolean> => {
+export const checkTituloUnico = async (titulo: string, materiaID?: number, notaId?: number): Promise<boolean> => {
   try {
-    const params: { titulo: string; materiaID?: number } = { titulo };
+    const params: { titulo: string; materiaID?: number; notaId?: number } = { titulo };
     if (materiaID !== undefined && materiaID !== null) {
       params.materiaID = materiaID;
     }
+    if (notaId !== undefined && notaId !== null) {
+      params.notaId = notaId;
+    }
     
     const response = await api.get(`/notas/check-titulo`, { params });
-    return response.data?.isUnique ?? true;
+    return response.data === false;
   } catch (error: unknown) {
     console.error('Error checking title uniqueness:', error);
     if (isAxiosErrorLike(error) && error.response?.status === 422) {
@@ -77,4 +88,51 @@ export const checkTituloUnico = async (titulo: string, materiaID?: number): Prom
     }
     throw new Error('Error al verificar el título. Por favor, intente nuevamente.');
   }
+};
+
+export const updateNota = async (
+  id: number,
+  nota: {
+    titulo: string;
+    contenido: string;
+    prioridad: string;
+    materiaID?: number;
+    fechaCreacion: string;
+  }
+): Promise<Nota> => {
+  try {
+    const payload: UpdateNotaPayload = {
+      titulo: nota.titulo,
+      contenido: nota.contenido,
+      prioridad: nota.prioridad,
+      fechaCreacion: nota.fechaCreacion,
+    };
+
+    if (nota.materiaID) {
+      payload.materia = { id: nota.materiaID };
+    }
+
+    const response = await api.put<Nota>(`/notas/${id}`, payload);
+    return response.data;
+  } catch (error: unknown) {
+    console.error('Error actualizando la nota:', error);
+
+    if (isAxiosErrorLike(error)) {
+      if (error.response?.status === 404) {
+        throw new Error('Nota no encontrada');
+      }
+      if (error.response?.status === 422) {
+        throw new Error('El título ya existe para esta materia');
+      }
+      if (error.response?.status === 400) {
+        throw new Error('Datos inválidos al actualizar la nota');
+      }
+    }
+
+    throw new Error('Error al actualizar la nota. Por favor, intente nuevamente.');
+  }
+};
+
+export const deleteNota = async (id: number): Promise<void> => {
+  await api.delete(`/notas/${id}`);
 };

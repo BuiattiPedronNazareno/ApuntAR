@@ -30,4 +30,13 @@ public interface NotaJpaRepository extends JpaRepository<Nota, Integer>, NotaRep
     @Override
     boolean existsByTituloAndMateria_Id(String titulo, Integer materiaId);
 
+    @Override
+    boolean existsByTituloAndMateria_IdAndIdNot(String titulo, Integer materiaId, Integer id);
+
+    @Override
+    boolean existsByTituloAndIdNot(String titulo, Integer id);
+
+    @Override
+    void deleteByMateria_Id(Integer materiaID);
+
 }

@@ -7,8 +7,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.apuntar.apuntarservidor.aplicacion.puertos.MateriaRepositoryPort;
+import com.apuntar.apuntarservidor.aplicacion.puertos.NotaRepositoryPort;
 import com.apuntar.apuntarservidor.dominio.modelos.Materia;
 import com.apuntar.apuntarservidor.dominio.servicios.MateriaDomainService;
+
+import jakarta.transaction.Transactional;
 
 @Service
 public class MateriaService {
@@ -16,10 +19,19 @@ public class MateriaService {
     @Autowired
     private MateriaRepositoryPort materiaRepository;
 
+    @Autowired
+    private NotaRepositoryPort notaRepository;
+
     private final MateriaDomainService materiaDomainService = new MateriaDomainService();
 
     public List<Materia> obtenerTodasLasMaterias(){
         return materiaRepository.findAll();
+    }
+
+    @Transactional
+    public void eliminarMateria(Integer id) {
+        notaRepository.deleteByMateria_Id(id);
+        materiaRepository.deleteById(id);
     }
 
     public Optional<Materia> obtenerPorId(Integer id){
@@ -32,10 +44,6 @@ public class MateriaService {
             throw new RuntimeException("El nombre de la materia ya está registrado");
         }
         return materiaRepository.save(materia);
-    }
-
-    public void eliminarMateria(Integer id){
-        materiaRepository.deleteById(id);
     }
 
     public Optional<Materia> obtenerPorNombre(String nombre){

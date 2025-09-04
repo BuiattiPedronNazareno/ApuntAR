@@ -31,12 +31,31 @@ public class NotaService {
     }
 
     public Nota persistirNota(Nota nota){
-        notaDomainService.validarCamposObligatorios(nota);
-        if (nota.getMateria() != null && notaRepository.existsByTituloAndMateria_Id(nota.getTitulo(), nota.getMateria().getId())) {
+    notaDomainService.validarCamposObligatorios(nota);
+
+    if (nota.getMateria() != null) {
+        boolean tituloDuplicado;
+        if (nota.getId() != null) {
+            tituloDuplicado = notaRepository.existsByTituloAndMateria_IdAndIdNot(
+                nota.getTitulo(),
+                nota.getMateria().getId(),
+                nota.getId()
+            );
+        } else {
+            tituloDuplicado = notaRepository.existsByTituloAndMateria_Id(
+                nota.getTitulo(),
+                nota.getMateria().getId()
+            );
+        }
+
+        if (tituloDuplicado) {
             throw new TituloDuplicadoException("EL_TITULO_YA_EXISTE_PARA_ESTA_MATERIA");
         }
-        return notaRepository.save(nota);
     }
+
+    return notaRepository.save(nota);
+}
+
 
     public void eliminarNota(Integer id){
         notaRepository.deleteById(id);
@@ -58,12 +77,20 @@ public class NotaService {
         return notaRepository.findByTitulo(titulo);
     }
 
-    public boolean existePorTitulo(String titulo, Integer materiaID){
+    public boolean existePorTitulo(String titulo, Integer materiaID, Integer notaId) {
         if (materiaID != null) {
-            return notaRepository.existsByTituloAndMateria_Id(titulo, materiaID);
+            if (notaId != null) {
+                return notaRepository.existsByTituloAndMateria_IdAndIdNot(titulo, materiaID, notaId);
+            } else {
+                return notaRepository.existsByTituloAndMateria_Id(titulo, materiaID);
+            }
         } else {
-            return notaRepository.existsByTitulo(titulo);
+            if (notaId != null) {
+                return notaRepository.existsByTituloAndIdNot(titulo, notaId);
+            } else {
+                return notaRepository.existsByTitulo(titulo);
+            }
         }
     }
-    
+
 }

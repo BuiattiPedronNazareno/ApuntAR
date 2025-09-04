@@ -12,8 +12,11 @@ export const getMaterias = async (): Promise<Materia[]> => {
     return response.data;
 };
 
-
 export const createMateria = async (materia: Omit<Materia, 'id'>): Promise<Materia> => {
     const response = await api.post<Materia>('/materias', materia);
     return response.data;
+};
+
+export const deleteMateria = async (id: number): Promise<void> => {
+    await api.delete(`/materias/${id}`);
 };

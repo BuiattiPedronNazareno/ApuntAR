@@ -2,8 +2,10 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Container, Typography, Box, Button } from '@mui/material';
-import { getNotaById } from '@/lib/nota';
+import {  Container, Typography, Box, Button, Card, CardContent, CircularProgress, IconButton } from '@mui/material';
+import { getNotaById, deleteNota } from '@/lib/nota';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
 
 export interface Nota {
     id: number;
@@ -34,10 +36,25 @@ export default function NotaDetail() {
         fetchNota();
     }, [id]);
 
+
+    const handleDelete = async () => {
+      if (!id) return;
+      const confirmDelete = window.confirm("¿Seguro que quieres eliminar esta nota?");
+      if (!confirmDelete) return;
+
+      try {
+        await deleteNota(Number(id));
+        router.push('/notas'); // Redirige a la lista después de borrar
+      } catch (error) {
+        console.error("Error al eliminar la nota:", error);
+        alert("Hubo un error al eliminar la nota.");
+      }
+    };
+
     if (loading) {
         return (
             <Container>
-                <Typography variant="h6">Cargando...</Typography>
+                <CircularProgress />
             </Container>
         );
     }
@@ -59,30 +76,97 @@ export default function NotaDetail() {
     }
 
   return (
-    <Container maxWidth="md">
-        <Box sx={{ mt: 4 }}>
-            <Typography variant="h4" gutterBottom>
-                {nota.titulo}
-            </Typography>
-            <Typography variant="body1" paragraph>
-                {nota.contenido}
-            </Typography>
-            <Typography variant="subtitle1" color="textSecondary">
-                Fecha de creación: {nota.fechaCreacion.toLocaleDateString()} {/* ✅ Correcto - usa métodos de Date */}
-            </Typography>
-            <Box sx={{ mt: 2 }}>
-                <Button 
-                    variant="contained" 
-                    color="primary" 
-                    onClick={() => router.back()}
-                    sx={{ 
-                        backgroundColor: '#234e68',
-                    }}
-                >
-                    Volver
-                </Button>
-            </Box>  
+    <Container maxWidth="xl" sx={{ mt: 0, p: 0 }}>
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          px: 2,
+          py: 1,
+        }}
+      >
+        <Button
+          variant="outlined"
+          color="primary"
+          onClick={() => router.push('/')}
+          sx={{ fontWeight: 'bold' }}
+        >
+          Volver
+        </Button>
+
+        <Box>
+          <IconButton color="error" onClick={handleDelete}>
+            <DeleteIcon />
+          </IconButton>
+
+          <IconButton
+            color="primary"
+            onClick={() => router.push(`/notas/${id}/editar/`)}
+          >
+            <EditIcon />
+          </IconButton>
         </Box>
+      </Box>
+
+      <Box
+        sx={{
+          display: 'flex',
+          flexGrow: 1,
+          height: 'calc(100vh - 100px)',
+          px: 2,
+        }}
+      >
+        <Card
+          variant="outlined"
+          sx={{
+            flex: 1,
+            borderRadius: 2,
+            boxShadow: 3,
+            display: 'flex',
+            flexDirection: 'column',
+            height: '100%',
+          }}
+        >
+          <CardContent
+            sx={{
+              flex: 1,
+              p: 2,
+              display: 'flex',
+              flexDirection: 'column',
+              '&:last-child': { pb: 2 },
+            }}
+          >
+            <Typography
+              variant="h4"
+              fontWeight="bold"
+              gutterBottom
+              sx={{ mb: 2 }}
+            >
+              {nota.titulo}
+            </Typography>
+
+            <Typography
+              variant="body1"
+              sx={{
+                flex: 1,
+                whiteSpace: 'pre-wrap',
+              }}
+            >
+              {nota.contenido}
+            </Typography>
+
+            <Typography
+              variant="subtitle2"
+              color="text.secondary"
+              sx={{ mt: 2 }}
+            >
+              Fecha de creación: {nota.fechaCreacion.toLocaleDateString()}
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
     </Container>
   );
+
 }
