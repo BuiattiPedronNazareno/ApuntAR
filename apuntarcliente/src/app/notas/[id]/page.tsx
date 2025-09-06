@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {  Container, Typography, Box, Button, Card, CardContent, CircularProgress, IconButton } from '@mui/material';
-import { getNotaById, deleteNota } from '@/lib/nota';
+import { getNotaById, deleteNota, getNotas } from '@/lib/nota';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
+import NotaRenderer from "@/componentes/NotaRenderer";
 
 export interface Nota {
     id: number;
@@ -21,12 +22,15 @@ export default function NotaDetail() {
     const router = useRouter();
     const [nota, setNota] = useState<Nota | null>(null);
     const [loading, setLoading] = useState(true);
+    const [todasLasNotas, setTodasLasNotas] = useState<{ id: number; titulo: string }[]>([]);
 
     useEffect(() => {
         const fetchNota = async () => {
         try {
-            const data = await getNotaById(Number(id));
-            setNota(data);
+          const data = await getNotaById(Number(id));
+          setNota(data);
+          const allNotas = await getNotas(); 
+          setTodasLasNotas(allNotas);
         } catch (error) {
             console.error('Error fetching note:', error);
         } finally {
@@ -134,6 +138,7 @@ export default function NotaDetail() {
               p: 2,
               display: 'flex',
               flexDirection: 'column',
+              overflowY: 'auto',
               '&:last-child': { pb: 2 },
             }}
           >
@@ -146,15 +151,15 @@ export default function NotaDetail() {
               {nota.titulo}
             </Typography>
 
-            <Typography
-              variant="body1"
+            <Box
               sx={{
                 flex: 1,
-                whiteSpace: 'pre-wrap',
+                overflowY: 'auto', 
+                pr: 1,            
               }}
             >
-              {nota.contenido}
-            </Typography>
+              <NotaRenderer contenido={nota.contenido} notas={todasLasNotas} />
+            </Box>
 
             <Typography
               variant="subtitle2"

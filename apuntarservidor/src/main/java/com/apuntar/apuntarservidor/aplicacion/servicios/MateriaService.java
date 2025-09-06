@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.apuntar.apuntarservidor.aplicacion.puertos.MateriaRepositoryPort;
 import com.apuntar.apuntarservidor.aplicacion.puertos.NotaRepositoryPort;
+import com.apuntar.apuntarservidor.dominio.excepciones.MateriaDuplicadaException;
 import com.apuntar.apuntarservidor.dominio.modelos.Materia;
 import com.apuntar.apuntarservidor.dominio.servicios.MateriaDomainService;
 
@@ -41,7 +42,7 @@ public class MateriaService {
     public Materia persistirMateria(Materia materia){
         materiaDomainService.validarCamposObligatorios(materia);
         if (materiaRepository.existsByNombre(materia.getNombre())) {
-            throw new RuntimeException("El nombre de la materia ya está registrado");
+            throw new MateriaDuplicadaException("El nombre de la materia ya está registrado");
         }
         return materiaRepository.save(materia);
     }

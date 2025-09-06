@@ -35,7 +35,7 @@ api.interceptors.response.use(response => {
 
 
 api.interceptors.response.use(response => response, error => {
-  console.error('API Error completo:', error);
+  //console.error('API Error completo:', error);
   if (error.response?.status !== 422) {
     const errorDetails = {
       url: error.config?.url || 'URL no disponible',
@@ -44,8 +44,10 @@ api.interceptors.response.use(response => response, error => {
       message: error.message || 'Mensaje no disponible',
       stack: error.stack || 'Stack no disponible'
     };
-    
-    console.error('API Error detallado:', errorDetails);
+
+    if (process.env.NODE_ENV === 'development') {
+      //console.error('API Error detallado:', JSON.stringify(errorDetails, null, 2));
+    }
 
     if (error.response?.status === 500) {
       console.error('Error 500 detectado - Verifica el backend');
@@ -53,17 +55,29 @@ api.interceptors.response.use(response => response, error => {
     }
 
     if (error.response?.status === 400) {
-      if (error.response.data && 
-          (error.response.data.mensaje?.includes("título ya existe") || 
-           error.response.data.codigo === "TITULO_DUPLICADO")) {
+      const data = error.response.data;
+
+      if (data?.mensaje?.includes("título ya existe") || data?.codigo === "TITULO_DUPLICADO") {
         return Promise.reject(new Error("El título ya existe para esta materia"));
       }
 
-      if (error.response.data && error.response.data.mensaje) {
-        return Promise.reject(new Error(error.response.data.mensaje));
+      if (data?.error?.includes("El nombre de la materia ya está registrado")) {
+        return Promise.reject(new Error(data.error));
       }
-      
-      return Promise.reject(new Error('Solicitud incorrecta. Por favor, revise los datos ingresados.'));
+
+      if (data?.mensaje) {
+        return Promise.reject(new Error(data.mensaje));
+      }
+
+      if (data?.error) {
+        return Promise.reject(new Error(data.error));
+      }
+
+      if (data?.codigo === "MATERIA_DUPLICADA") {
+        return Promise.reject(new Error(data.mensaje || "El nombre de la materia ya está registrado"));
+      }
+
+      return Promise.reject(new Error(data.mensaje || data.error || "Solicitud incorrecta."));
     }
 
     if (!error.response) {

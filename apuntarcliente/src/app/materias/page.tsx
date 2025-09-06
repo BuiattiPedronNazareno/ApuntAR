@@ -216,56 +216,78 @@ export default function MateriasPage() {
 
         {!isSelecting && (
             <Box
-            sx={{
-                position: "fixed",
-                bottom: 24,
-                right: 24,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 2
-            }}
-            >
-            <Box sx={{ textAlign: "center" }}>
-                <Fab
-                component={Link}
-                href="/"
-                sx={{ boxShadow: 3, mb: 0.5 }}
-                >
-                <HomeIcon />
-                </Fab>
-                <Typography variant="caption" sx={{ display: "block", textAlign: "center" }}>
-                Home
-                </Typography>
-            </Box>
-            <Fab 
-                onClick={handleStartSelecting}
                 sx={{
-                boxShadow: 3
+                    position: "fixed",
+                    bottom: 24,
+                    right: 24,
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: "center",
+                    gap: 2
                 }}
             >
-                <DeleteIcon />
-            </Fab>
+                <Box sx={{ textAlign: "center" }}>
+                    <Fab
+                    component={Link}
+                    href="/"
+                    sx={{ boxShadow: 3, mb: 0.5 }}
+                    >
+                        <HomeIcon />
+                    </Fab>
+                    <Typography variant="caption" sx={{ display: "block", textAlign: "center" }}>
+                        Home
+                    </Typography>
+                </Box>
+
+                <Fab 
+                    onClick={handleStartSelecting}
+                    sx={{
+                        boxShadow: 3
+                    }}
+                >
+                    <DeleteIcon />
+                </Fab>
             </Box>
         )}
 
         {isSelecting && (
             <Box sx={{ display: "flex", justifyContent: "center", gap: 2, mt: 4 }}>
-            <Button
-                variant="contained"
-                color="error"
-                onClick={() => setOpenDialog(true)}
-                disabled={selectedMaterias.length === 0}
-            >
-                Aceptar
-            </Button>
-            <Button
-                variant="outlined"
-                color="primary"
-                onClick={handleCancel}
-            >
-                Cancelar
-            </Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={() => setOpenDialog(true)}
+                    disabled={selectedMaterias.length === 0}
+                >
+                    Aceptar
+                </Button>
+                <Button
+                    variant="outlined"
+                    color="primary"
+                    onClick={handleCancel}
+                >
+                    Cancelar
+                </Button>
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={async () => {
+                        if (confirm("⚠️ Esto eliminará TODAS tus materias y sus notas asociadas. ¿Desea continuar?")) {
+                        try {
+                            for (const materia of materias) {
+                            await deleteMateria(materia.id);
+                            }
+                            setMaterias([]);
+                            setIsSelecting(false);
+                            setSelectedMaterias([]);
+                        } catch (error) {
+                            console.error("Error eliminando todas las materias:", error);
+                            alert("No se pudieron eliminar todas las materias.");
+                        }
+                        }
+                    }}
+                    >
+                    Eliminar todas
+                </Button>
             </Box>
         )}
 

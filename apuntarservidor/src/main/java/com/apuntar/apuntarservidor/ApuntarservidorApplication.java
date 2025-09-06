@@ -6,7 +6,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@SpringBootApplication(scanBasePackages = "com.apuntar.apuntarservidor")
+@SpringBootApplication(scanBasePackages = {
+    "com.apuntar.apuntarservidor",
+    "com.apuntar.apuntarservidor.infraestructura.web"
+})
 public class ApuntarservidorApplication {
 
 	public static void main(String[] args) {

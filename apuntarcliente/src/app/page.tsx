@@ -269,15 +269,11 @@ export default function Home() {
               Materias
             </Typography>
           </Box>
-          <Fab 
-            
-            onClick={handleStartSelecting}
-            sx={{
-              boxShadow: 3
-            }}
-          >
+
+          <Fab onClick={handleStartSelecting} sx={{ boxShadow: 3 }}>
             <DeleteIcon />
           </Fab>
+
         </Box>
       )}
 
@@ -297,6 +293,28 @@ export default function Home() {
             onClick={handleCancel}
           >
             Cancelar
+          </Button>
+
+          <Button
+            variant="contained"
+            color="error"
+            onClick={async () => {
+              if (confirm("⚠️ Esto eliminará TODAS tus notas. ¿Desea continuar?")) {
+                try {
+                  for (const nota of notas) {
+                    await deleteNota(nota.id);
+                  }
+                  setNotas([]);
+                  setIsSelecting(false);
+                  setSelectedNotas([]);
+                } catch (error) {
+                  console.error("Error eliminando todas las notas:", error);
+                  alert("No se pudieron eliminar todas las notas.");
+                }
+              }
+            }}
+          >
+            Eliminar todas
           </Button>
         </Box>
       )}
