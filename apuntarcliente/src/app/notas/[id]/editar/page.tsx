@@ -100,10 +100,10 @@ export default function EditarNota() {
           </Typography>
           <Box mt={2}>
             <Typography variant="body2" sx={{ fontStyle: "italic" }}>
-              Ejemplo:
-                cambiar ![](enlace/a/la/imagen.jpg)&lcub;size=500&rcub; <br />
-                a ![](enlace/a/la/imagen.jpg)&lcub;size=100&rcub; <br />
-                y se hace más chico
+              {`Ejemplo: `} <br />
+                {`cambiar ![](enlace/a/la/imagen.jpg){size=500};`}<br />
+                {`a ![](enlace/a/la/imagen.jpg){size=100};`} <br />
+                {`y se hace más chico`}
             </Typography>
           </Box>
         </>
