@@ -3,19 +3,10 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import {  Container, Typography, Box, Button, Card, CardContent, CircularProgress, IconButton } from '@mui/material';
-import { getNotaById, deleteNota, getNotas } from '@/lib/nota';
+import { getNotaById, deleteNota, getNotas, Nota } from '@/lib/nota';
 import EditIcon from '@mui/icons-material/Edit';
 import DeleteIcon from '@mui/icons-material/Delete';
 import NotaRenderer from "@/componentes/NotaRenderer";
-
-export interface Nota {
-    id: number;
-    titulo: string;
-    contenido: string;
-    prioridad: string;
-    fechaCreacion: Date;
-    materiaID: number;
-}
 
 export default function NotaDetail() {
     const { id } = useParams();
@@ -166,7 +157,7 @@ export default function NotaDetail() {
               color="text.secondary"
               sx={{ mt: 2 }}
             >
-              Fecha de creación: {nota.fechaCreacion.toLocaleDateString()}
+              Fecha de creación: {new Date(nota.fechaCreacion).toLocaleDateString()}
             </Typography>
           </CardContent>
         </Card>

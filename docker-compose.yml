@@ -1,0 +1,49 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: apuntar-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: apuntarBD
+      MYSQL_USER: apuntar
+      MYSQL_PASSWORD: apuntar
+    ports:
+      - "3306:3306"
+    volumes:
+      - db_data:/var/lib/mysql
+
+  backend:
+    build:
+      context: ./apuntarservidor
+      dockerfile: Dockerfile
+    container_name: apuntar-backend
+    restart: always
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/apuntarBD?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: apuntar
+      SPRING_DATASOURCE_PASSWORD: apuntar
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: ./apuntarcliente
+      dockerfile: Dockerfile
+    container_name: apuntar-frontend
+    restart: always
+    environment:
+      NEXT_PUBLIC_API_URL: /api
+    extra_hosts:
+    - "host.docker.internal:host-gateway"
+    ports:
+      - "3000:3000"
+    depends_on:
+      - backend
+
+volumes:
+  db_data:

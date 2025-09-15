@@ -3,7 +3,7 @@
 import { useRouter } from 'next/navigation';
 import { useState, useEffect } from "react";
 import { Container, Box, Typography, TextField, Button, Alert, CircularProgress, Snackbar, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
-import { getMateriasPorUsuario, createMateria } from '@/lib/materia';
+import { createMateria } from '@/lib/materia';
 
 interface Materia {
     id: number;
