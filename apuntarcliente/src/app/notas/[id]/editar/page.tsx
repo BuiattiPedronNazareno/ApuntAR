@@ -119,7 +119,10 @@ export default function EditarNota() {
     formData.append("file", file);
 
     try {
-      const res = await fetch("http://localhost:8080/api/upload", {
+
+      const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
+    const uploadUrl = API_URL.endsWith('/') ? `${API_URL}upload` : `${API_URL}/upload`;
+      const res = await fetch(uploadUrl, {
         method: "POST",
         body: formData,
       });
