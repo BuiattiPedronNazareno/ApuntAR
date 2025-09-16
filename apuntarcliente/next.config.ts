@@ -10,7 +10,22 @@ const nextConfig = {
         destination: 'http://backend:8080/uploads/:path*',
       }
     ]
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/uploads/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'no-store, max-age=0',
+          }
+        ],
+      },
+    ]
   }
+  
 }
 
 module.exports = nextConfig

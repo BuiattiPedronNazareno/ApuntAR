@@ -1,4 +1,3 @@
-
 services:
   db:
     image: mysql:8.0
@@ -28,6 +27,8 @@ services:
       - "8080:8080"
     depends_on:
       - db
+    volumes:
+      - uploads-volume:/app/uploads
 
   frontend:
     build:
@@ -43,6 +44,9 @@ services:
       - "3000:3000"
     depends_on:
       - backend
+    volumes:
+      - uploads-volume:/app/uploads
 
 volumes:
   db_data:
+  uploads-volume: 
