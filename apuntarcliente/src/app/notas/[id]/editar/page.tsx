@@ -121,13 +121,20 @@ export default function EditarNota() {
     try {
 
       const API_URL = process.env.NEXT_PUBLIC_API_URL || '/api';
-    const uploadUrl = API_URL.endsWith('/') ? `${API_URL}upload` : `${API_URL}/upload`;
+      const uploadUrl = API_URL.endsWith('/') ? `${API_URL}upload` : `${API_URL}/upload`;
       const res = await fetch(uploadUrl, {
         method: "POST",
         body: formData,
       });
+
+      if (!res.ok) {
+        throw new Error(`Error ${res.status}: ${res.statusText}`);
+      }
+
       const data = await res.json();
-      const url = data.url;
+      const url = data.url.startsWith('/uploads/') ? 
+        `/api${data.url}` : 
+        data.url;
       setImgUrl(url);
       setImgWidth(200);
 

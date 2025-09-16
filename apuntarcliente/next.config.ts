@@ -6,26 +6,22 @@ const nextConfig = {
         destination: 'http://backend:8080/api/:path*',
       },
       {
-        source: '/uploads/:path*',
+        source: '/api/uploads/:path*',
         destination: 'http://backend:8080/uploads/:path*',
       }
     ]
   },
-
   async headers() {
     return [
       {
-        source: '/uploads/:path*',
+        source: '/api/uploads/:path*',
         headers: [
-          {
-            key: 'Cache-Control',
-            value: 'no-store, max-age=0',
-          }
+          { key: 'Cache-Control', value: 'no-store, max-age=0' }
         ],
       },
     ]
   }
-  
+
 }
 
 module.exports = nextConfig
