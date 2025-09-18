@@ -23,5 +23,8 @@ public class WebConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/uploads/**")
                 .addResourceLocations("file:" + uploadsPath)
                 .setCacheControl(CacheControl.noCache()); 
+
+        registry.setOrder(1);
+        
     }
 }

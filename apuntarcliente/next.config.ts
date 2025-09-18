@@ -6,7 +6,7 @@ const nextConfig = {
         destination: 'http://backend:8080/api/:path*',
       },
       {
-        source: '/api/uploads/:path*',
+        source: '/uploads/:path*',
         destination: 'http://backend:8080/uploads/:path*',
       }
     ]
@@ -14,7 +14,7 @@ const nextConfig = {
   async headers() {
     return [
       {
-        source: '/api/uploads/:path*',
+        source: '/uploads/:path*',
         headers: [
           { key: 'Cache-Control', value: 'no-store, max-age=0' }
         ],

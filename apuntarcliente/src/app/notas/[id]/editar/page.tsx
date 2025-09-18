@@ -132,9 +132,7 @@ export default function EditarNota() {
       }
 
       const data = await res.json();
-      const url = data.url.startsWith('/uploads/') ? 
-        `/api${data.url}` : 
-        data.url;
+      const url = data.url;
       setImgUrl(url);
       setImgWidth(200);
 
