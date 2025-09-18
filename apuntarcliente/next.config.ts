@@ -7,7 +7,7 @@ const nextConfig = {
       },
       {
         source: '/uploads/:path*',
-        destination: 'http://backend:8080/uploads/:path*',
+        destination: 'http://backend:8080/api/uploads/:path*',
       }
     ]
   },
